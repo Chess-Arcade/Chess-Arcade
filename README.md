@@ -6,3 +6,4 @@
 
  ## Wireframing
  ![Chess Board](Assets/wireframe.png)
+ ![Domain Model](Assets/domain_model.png)
