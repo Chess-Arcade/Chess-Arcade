@@ -97,7 +97,7 @@ class Bishop(Piece):
     def valid_moves(self, board):
         current_position = [self.row, self.col]
 
-        def not_off_board(row, col):
+        def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 return True
 
