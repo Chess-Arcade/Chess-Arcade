@@ -73,9 +73,7 @@ class Queen(Piece):
                 self.move_list.pop()
             return
         
-        up = current_position[0] 
-        
-    #TODO: build the moves checking
+
 
 
 class Knight(Piece):
