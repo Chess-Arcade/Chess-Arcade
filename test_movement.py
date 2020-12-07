@@ -44,8 +44,8 @@ def test_pawn_validate_attacking():
     board.board[2][3] = Pawn(2,3,'w')
     pawn = board.board[1][4]
     pawn.valid_moves(board)
-    actual = pawn.move_list
-    expected =  [[2, 4], [3, 4], [2, 3]]               
+    actual = pawn.attack_list
+    expected =  [[2, 3]]               
     assert actual == expected
 
 def test_pawn_no_valid_moves():
@@ -56,6 +56,7 @@ def test_pawn_no_valid_moves():
     actual = white_pawn.move_list
     expected = []
     assert actual == expected
+
 
 # Rook Tests:
 def test_rook_no_valid_start_moves():
@@ -91,4 +92,20 @@ def test_knight_valid_start_moves():
     knight.valid_moves(board)
     actual = knight.move_list
     expected = [[5, 2], [5, 4]]
+
+# Bishop Tests:
+def test_bishop_valid_moves():
+    board = Board()
+    bishop = Bishop(1,3,'b')
+    bishop.valid_moves(board)
+    actual = bishop.move_list
+    expected = [[2, 4], [3, 5], [4, 6], [5, 7], [2, 2], [3, 1], [4, 0]]
+    assert actual == expected
+
+def test_bishop_valid_moves_two():
+    board = Board()
+    bishop = Bishop(4,4,'b')
+    bishop.valid_moves(board)
+    actual = bishop.move_list
+    expected = [[3, 3], [2, 2], [3, 5], [2, 6], [5, 5], [6, 6], [7, 7], [5, 3], [6, 2], [7, 1]]
     assert actual == expected
