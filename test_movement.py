@@ -61,5 +61,5 @@ def test_rook_valid_moves():
     rook= Rook(4,4,'w')
     rook.valid_moves(board)
     actual = rook.move_list
-    expected = []
+    expected = [[3, 4], [2, 4], [1, 4], [0, 4], [5, 4], [4, 3], [4, 2], [4, 1], [4, 0], [4, 5], [4, 6], [4, 7]]
     assert actual == expected

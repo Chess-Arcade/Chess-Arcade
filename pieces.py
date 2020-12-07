@@ -1,19 +1,19 @@
 import os
-from board import Board
+# from board import Board
 
-b_bishop = pygame.image.load(os.path.join('assets', 'black_bishop.png'))
-b_king = pygame.image.load(os.path.join('assets', 'black_king.png'))
-b_knight = pygame.image.load(os.path.join('assets', 'black_knight.png'))
-b_pawn = pygame.image.load(os.path.join('assets', 'black_pawn.png'))
-b_queen = pygame.image.load(os.path.join('assets', 'black_queen.png'))
-b_rook = pygame.image.load(os.path.join('assets', 'black_rook.png'))
+# b_bishop = pygame.image.load(os.path.join('assets', 'black_bishop.png'))
+# b_king = pygame.image.load(os.path.join('assets', 'black_king.png'))
+# b_knight = pygame.image.load(os.path.join('assets', 'black_knight.png'))
+# b_pawn = pygame.image.load(os.path.join('assets', 'black_pawn.png'))
+# b_queen = pygame.image.load(os.path.join('assets', 'black_queen.png'))
+# b_rook = pygame.image.load(os.path.join('assets', 'black_rook.png'))
 
-w_bishop = pygame.image.load(os.path.join('assets', 'white_bishop.png'))
-w_king = pygame.image.load(os.path.join('assets', 'white_king.png'))
-w_knight = pygame.image.load(os.path.join('assets', 'white_knight.png'))
-w_pawn = pygame.image.load(os.path.join('assets', 'white_pawn.png'))
-w_queen = pygame.image.load(os.path.join('assets', 'white_queen.png'))
-w_rook = pygame.image.load(os.path.join('assets', 'white_rook.png'))
+# w_bishop = pygame.image.load(os.path.join('assets', 'white_bishop.png'))
+# w_king = pygame.image.load(os.path.join('assets', 'white_king.png'))
+# w_knight = pygame.image.load(os.path.join('assets', 'white_knight.png'))
+# w_pawn = pygame.image.load(os.path.join('assets', 'white_pawn.png'))
+# w_queen = pygame.image.load(os.path.join('assets', 'white_queen.png'))
+# w_rook = pygame.image.load(os.path.join('assets', 'white_rook.png'))
 
 class Piece:
 
