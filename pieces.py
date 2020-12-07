@@ -25,7 +25,7 @@ class Piece:
 
 class King(Piece):
 
-	
+
     def valid_moves(self, board):
         position = [self.row, self.col]
 
