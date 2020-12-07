@@ -95,16 +95,53 @@ class Knight(Piece):
 class Bishop(Piece):
 
     def valid_moves(self, board):
-        def off_board(move):
+        current_position = [self.row, self.col]
+
+        def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                self.move_list += [move]
-            return
+                return True
 
         def same_color_piece(move):
-            if board.board[move[0]][move[1]].color == self.color:
-                self.move_list.pop()
+            if board.board[move[0]][move[1]]:
+                if board.board[move[0]][move[1]].color == self.color:
+                    return True
+
+        def diagonal_north_west():
+            position = [current_position[0] - 1, current_position[1] - 1]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] -1, position[1] - 1]
             return
-    #TODO: build the moves checking
+        
+        def diagonal_north_east():
+            position = [current_position[0] - 1, current_position[1] + 1]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] - 1, position[1] + 1]
+            return
+
+        def diagonal_south_east():
+            position = [current_position[0] + 1, current_position[1] + 1]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] + 1, position[1] + 1]
+            return
+
+        def diagonal_south_west():
+            position = [current_position[0] + 1, current_position[1] - 1]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] + 1, position[1] - 1]
+            return
+        
+        diagonal_north_west()
+        diagonal_north_east()
+        diagonal_south_east()
+        diagonal_south_west()
 
 class Rook(Piece):
 
