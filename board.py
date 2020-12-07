@@ -43,6 +43,12 @@ class Board:
         self.board[6][5] = Pawn(6, 5, 'w')
         self.board[6][6] = Pawn(6, 6, 'w')
         self.board[6][7] = Pawn(6, 7, 'w')
+    
+    def empty_board(self, x, y):
+        if self.board[x][y] == '0':
+            return True
+        else:
+            return False
 
     def display_board(self):
         pass
