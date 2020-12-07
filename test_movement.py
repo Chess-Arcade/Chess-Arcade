@@ -99,7 +99,7 @@ def test_bishop_valid_moves():
     bishop = Bishop(1,3,'b')
     bishop.valid_moves(board)
     actual = bishop.move_list
-    expected = [[2, 4], [3, 5], [4, 6], [5, 7], [2, 2], [3, 1], [4, 0]]
+    expected = [[0, 2], [0, 4], [2, 4], [3, 5], [4, 6], [5, 7], [2, 2], [3, 1], [4, 0]]
     assert actual == expected
 
 def test_bishop_valid_moves_two():
@@ -107,5 +107,25 @@ def test_bishop_valid_moves_two():
     bishop = Bishop(4,4,'b')
     bishop.valid_moves(board)
     actual = bishop.move_list
-    expected = [[3, 3], [2, 2], [3, 5], [2, 6], [5, 5], [6, 6], [7, 7], [5, 3], [6, 2], [7, 1]]
+    expected = [[3, 3], [2, 2],[1,1], [0, 0], [3, 5], [2, 6], [1, 7], [5, 5], [6, 6], [7, 7], [5, 3], [6, 2], [7, 1]]
+    assert actual == expected
+
+def test_bishop_attacking():
+    board = Board()
+    bishop = Bishop(4,3,'w')
+    board.board[4][3] = bishop
+    board.board[5][4] = Pawn(5,4,'b')
+    bishop.valid_moves(board)
+    actual = bishop.attack_list
+    expected = [[5,4]]
+    assert actual == expected
+
+def test_bishop_no_moves_after_attacking():
+    board = Board()
+    bishop = Bishop(4,3,'w')
+    board.board[4][3] = bishop
+    board.board[5][4] = Pawn(5,4,'b')
+    bishop.valid_moves(board)
+    actual = bishop.move_list
+    expected = [[3, 2], [2, 1], [1, 0], [3, 4], [2, 5], [1, 6], [0, 7], [5, 2], [6, 1], [7, 0]]
     assert actual == expected

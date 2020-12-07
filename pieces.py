@@ -26,7 +26,7 @@ class Piece:
 
 class King(Piece):
 
-	
+
     def valid_moves(self, board):
         position = [self.row, self.col]
 
@@ -124,38 +124,65 @@ class Bishop(Piece):
                 if board.board[move[0]][move[1]].color == self.color:
                     return True
 
+        def validate_possibility(move):
+            if not_off_board(move) and not same_color_piece(move):
+                return True
+
         def diagonal_north_west():
             position = [current_position[0] - 1, current_position[1] - 1]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
-                position = [position[0] -1, position[1] - 1]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
+                position = [position[0] - 1, position[1] - 1]
             return
         
         def diagonal_north_east():
             position = [current_position[0] - 1, current_position[1] + 1]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
                 position = [position[0] - 1, position[1] + 1]
             return
 
         def diagonal_south_east():
             position = [current_position[0] + 1, current_position[1] + 1]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
                 position = [position[0] + 1, position[1] + 1]
             return
 
         def diagonal_south_west():
             position = [current_position[0] + 1, current_position[1] - 1]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
                 position = [position[0] + 1, position[1] - 1]
             return
         
+        
+
+
         diagonal_north_west()
         diagonal_north_east()
         diagonal_south_east()
