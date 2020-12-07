@@ -81,15 +81,32 @@ class Queen(Piece):
 class Knight(Piece):
 
     def valid_moves(self, board):
-        def off_board(move):
+
+        position = [self.row, self.col]
+        
+        def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                self.move_list += [move]
-            return
+                return True
 
         def same_color_piece(move):
-            if board.board[move[0]][move[1]].color == self.color:
-                self.move_list.pop()
-            return
+            if board.board[move[0]][move[1]]:
+                if board.board[move[0]][move[1]].color == self.color:
+                    return True
+        
+        left_up = [position[0] - 2,position[1] - 1]
+        left_down = [position[0] - 2,position[1] + 1]
+        up_left = [position[0] - 1,position[1] - 2]
+        down_left = [position[0] - 1,position[1] + 2]
+        right_up = [position[0] + 2,position[1] - 1]
+        right_down = [position[0] + 2,position[1] + 1]
+        up_right = [position[0] + 1,position[1] - 2]
+        down_right = [position[0] + 1,position[1] + 2]
+        moves = [left_up,left_down,up_left,down_left,right_up,right_down,up_right,down_right]
+        
+        for move in moves:
+            if not_off_board(move) and not same_color_piece(move):
+                self.move_list += [move]
+
     #TODO: build the moves checking
 
 class Bishop(Piece):

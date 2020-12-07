@@ -1,6 +1,5 @@
-from pieces import King
 from board import Board 
-from pieces import Pawn, Rook
+from pieces import Pawn, Rook, King, Queen, Knight, Bishop
 
 def test_king_no_valid_start_moves():
     board = Board()
@@ -62,4 +61,20 @@ def test_rook_valid_moves():
     rook.valid_moves(board)
     actual = rook.move_list
     expected = [[3, 4], [2, 4], [1, 4], [0, 4], [5, 4], [4, 3], [4, 2], [4, 1], [4, 0], [4, 5], [4, 6], [4, 7]]
+    assert actual == expected
+
+def test_knight_valid_moves():
+    board = Board()
+    knight = Knight(4,4,'w')
+    knight.valid_moves(board)
+    actual = knight.move_list
+    expected = [[2, 3], [2, 5], [3, 2], [3, 6], [5, 2], [5, 6]]
+    assert actual == expected
+
+def test_knight_valid_start_moves():
+    board = Board()
+    knight = Knight(7,3,'w')
+    knight.valid_moves(board)
+    actual = knight.move_list
+    expected = [[5, 2], [5, 4]]
     assert actual == expected
