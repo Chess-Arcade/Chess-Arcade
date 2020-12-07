@@ -4,7 +4,7 @@ class Board:
 
     def __init__(self):
         self.board = [[0 for x in range(8)] for y in range(8)]
-        self.reset_pieces()
+        # self.reset_pieces()
 
     def reset_pieces(self):
 

@@ -17,11 +17,12 @@ import os
 
 class Piece:
 
-	def __init__(self, row, col, color):
-		self.row = row
-		self.col = col
-		self.color = color
-		self.move_list = []
+    def __init__(self, row, col, color):
+        self.row = row
+        self.col = col
+        self.color = color
+        self.move_list = []
+        self.attack_list = []
 
 class King(Piece):
 
@@ -83,7 +84,7 @@ class Knight(Piece):
     def valid_moves(self, board):
 
         position = [self.row, self.col]
-        
+
         def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 return True
@@ -185,6 +186,7 @@ class Rook(Piece):
 # Pawns direction of movement depends on the pawn's color (black moves down the board, white moves up the board)
 class Pawn(Piece):
     def valid_moves(self, board):
+
         def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 return True
@@ -201,35 +203,49 @@ class Pawn(Piece):
         current_position = [self.row, self.col]
         move_counter = 0
         if self.color == 'w':
-            if not move_counter:
-                forward_two = [current_position[0] - 2, current_position[1]]
-                validate_possibility(forward_two)
+
+
             forward = [current_position[0] - 1, current_position[1]]
-            validate_possibility(forward)
-            if board.board[current_position[0] - 1][current_position[1] - 1]:
-                if board.board[current_position[0] - 1][current_position[1] - 1].color == 'b':
-                    attack_left = [current_position[0] - 1, current_position[1] - 1]
+            if not board.board[forward[0]][forward[1]]:
+                validate_possibility(forward)
+
+                forward_two = [current_position[0] - 2, current_position[1]]
+                if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
+                    validate_possibility(forward_two)
+
+            attack_left = [current_position[0] - 1, current_position[1] - 1]
+            if board.board[attack_left[0]][attack_left[1]]:
+                if board.board[attack_left[0]][attack_left[1]].color == 'b':
                     validate_possibility(attack_left)
-            if board.board[current_position[0] - 1][current_position[1] + 1]:
-                if board.board[current_position[0] - 1][current_position[1] + 1].color == 'b':
-                    attack_right = [current_position[0] - 1, current_position[1] + 1]
+
+            attack_right = [current_position[0] - 1, current_position[1] + 1]
+            if board.board[attack_right[0]][attack_right[1]]:
+                if board.board[attack_right[0]][attack_right[1]].color == 'b':
                     validate_possibility(attack_right)
 
         elif self.color == 'b':
-            if not move_counter:
-                forward_two = [current_position[0] + 2, current_position[1]]
-                validate_possibility(forward_two)
+
+
             forward = [current_position[0] + 1, current_position[1]]
-            validate_possibility(forward)
-            if board.board[current_position[0] + 1][current_position[1] - 1]:
-                if board.board[current_position[0] + 1][current_position[1] - 1].color == 'w':
-                    attack_left = [current_position[0] + 1, current_position[1] - 1]
+            if not board.board[forward[0]][forward[1]]:
+                validate_possibility(forward)
+                forward_two = [current_position[0] + 2, current_position[1]]
+                if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
+                    validate_possibility(forward_two)
+
+            attack_left = [current_position[0] + 1, current_position[1] - 1]
+            if board.board[attack_left[0]][attack_left[1]]:
+                if board.board[attack_left[0]][attack_left[1]].color == 'w':
                     validate_possibility(attack_left)
-            if board.board[current_position[0] + 1][current_position[1] + 1]:
-                if board.board[current_position[0] + 1][current_position[1] + 1].color == 'w':
-                    attack_right = [current_position[0] + 1, current_position[1] + 1]
+
+            attack_right = [current_position[0] + 1, current_position[1] + 1]
+            if board.board[attack_right[0]][attack_right[1]]:
+                if board.board[attack_right[0]][attack_right[1]].color == 'w':
                     validate_possibility(attack_right)
-        
+        if self.row == 0 or 7:
+            current_position = [self.row, self.col]
+            color = self.color
+            self = Queen(current_position[0],current_position[1], color)
         return 
-    #TODO: build the moves checking
+    #TODO: add ability to switch to queen if it reaches
     #TODO: fix up same color piece check, it seems to always pop out all the solutions
