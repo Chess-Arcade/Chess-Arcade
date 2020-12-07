@@ -35,8 +35,9 @@ class King(Piece):
             return
 
         def same_color_piece(move):
-            if board.board[move[0]][move[1]].color == self.color:
-                self.move_list.pop()
+            if board.board[move[0]][move[1]]:
+                if board.board[move[0]][move[1]].color == self.color:
+                    self.move_list.pop()
             return
 
         up = [position[0] - 1, position[1]]
@@ -108,7 +109,9 @@ class Bishop(Piece):
 class Rook(Piece):
 
     def valid_moves(self, board):
+
         current_position = [self.row,self.col]
+
         def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 return True
@@ -119,33 +122,43 @@ class Rook(Piece):
                     return True
 
         def left():
-            position = [current_position[0] - 1, current_position[1]]
+            position = [current_position[0], current_position[1] - 1]
+           
             while not_off_board(position) and not same_color_piece(position):
-                self.move_list += [position]
-                position[0] += -1
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0], position[1] - 1]
             return
+
         def right():
-            position = [current_position[0] + 1, current_position[1]]
-            while not_off_board(position) and not same_color_piece(position):
-                self.move_list += [position]
-                position[0] += 1
-            return
-        def up():
             position = [current_position[0], current_position[1] + 1]
             while not_off_board(position) and not same_color_piece(position):
-                self.move_list += [position]
-                position[1] += 1
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0], position[1] + 1]
             return
-        def down():
-            position = [current_position[0], current_position[1] - 1]
+
+        def up():
+            position = [current_position[0] - 1, current_position[1]]
             while not_off_board(position) and not same_color_piece(position):
-                self.move_list += [position]
-                position[1] += -1
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] - 1, position[1]]
             return
+
+        def down():
+            position = [current_position[0] + 1, current_position[1]]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] + 1, position[1]]
+            return
+
         up()
         down()
         left()
         right()
+
     #TODO: build the moves checking
 
 # Pawn class includes a move counter to track the first move when moving forward by 2 steps is a valid move

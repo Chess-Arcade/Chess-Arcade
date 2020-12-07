@@ -11,6 +11,14 @@ def test_king_no_valid_start_moves():
     expected = []
     assert actual == expected
 
+def test_king_valid_start_moves():
+    board = Board()
+    king = King(4,4,'w')
+    king.valid_moves(board)
+    actual = king.move_list
+    expected = [[3, 4], [5, 4], [4, 3], [4, 5], [5, 3], [5, 5], [3, 3], [3, 5]]
+    assert actual == expected
+
 def test_valid_white_center_pawn_moves():
     board = Board()
     board.reset_pieces()
@@ -51,8 +59,7 @@ def test_rook_no_valid_start_moves():
 def test_rook_valid_moves():
     board = Board()
     rook= Rook(4,4,'w')
-    board.board[4][4] = rook
     rook.valid_moves(board)
     actual = rook.move_list
-    expected = []
+    expected = [[3, 4], [2, 4], [1, 4], [0, 4], [5, 4], [4, 3], [4, 2], [4, 1], [4, 0], [4, 5], [4, 6], [4, 7]]
     assert actual == expected
