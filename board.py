@@ -67,5 +67,24 @@ class Board:
         #TODO: build something to check for a check position
 
     def move(self, piece):
-        pass
-        #TODO: build something to register user input movements and update the board
+        while True:
+            try:
+                self.board = int(input())
+        
+                if self.board[destination_x_WK][destination_y_WK] == '.' :
+
+                    if ( abs(self.position_x_WK-destination_x_WK) <2 and abs(self.position_y_WK-destination_y_WK) < 2 ):
+                        self.board[self.position_x_WK][self.position_y_WK] = '.'
+                        self.position_x_WK = destination_x_WK
+                        self.position_y_WK = destination_y_WK
+                        self.board[self.position_x_WK][self.position_y_WK] = self.symbol_WK
+
+                        return self.board
+                        break
+
+                    else:
+                        print ('your move is invalid, please choose cooridnates again')
+                        continue
+
+            except:
+                pass
