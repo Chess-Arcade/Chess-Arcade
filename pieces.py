@@ -16,7 +16,15 @@ import os
 # w_rook = pygame.image.load(os.path.join('assets', 'white_rook.png'))
 
 class Piece:
-
+    '''
+    The piece base class applies to all the following chess piece classes. This class contains a reference to the piece's
+    current row and column within the grid as integer indices from 0 to 7. The color property is a string of w or b which
+    indicates the black or white orientation of the piece. The move_list is a list of the valid moves that a piece can 
+    make from its current position on the board. It does not include the attack_list which are valid moves that indicate
+    that the piece is capturing another piece. The valid moves are determined in the sub classes that follow. Finally, 
+    there is a move_counter which tracks the state of the piece's activity to determine factors like castling and pawns
+    being able to move twice on the first move.
+    '''
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
@@ -24,21 +32,32 @@ class Piece:
         self.move_list = []
         self.attack_list = []
         self.move_counter = 0
+    
+    def not_off_board(self, move):
+        if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
+            return True
+
+    def same_color_piece(self, move, board):
+        if board.board[move[0]][move[1]]:
+            if board.board[move[0]][move[1]].color == self.color:
+                return True
+
+    def validate_possibility(self, move, board):
+        if self.not_off_board(move) and not self.same_color_piece(move, board):
+            return True
 
 class King(Piece):
-
+    '''
+    The king can move one space in any direction as long as there is no piece of the same color on that square, 
+    that square is not off the board, and there is no piece that would put the king in check if the king were to 
+    move to that square. If the king has not moved yet, and neither has the rook with which it wants to castle, 
+    the king can step over two squares towards the rook and have the rook hop directly over the king to the adjacent
+    square. Castling can only occur if there is no piece of the same color sitting on any of the tiles being traversed, 
+    and so long as the king is not placed in check along its path.
+    '''
 
     def valid_moves(self, board):
         position = [self.row, self.col]
-
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
 
         up = [position[0] - 1, position[1]]
         down = [position[0] + 1, position[1]]
@@ -48,7 +67,6 @@ class King(Piece):
         up_right = [position[0] - 1, position[1] + 1]
         down_left = [position[0] + 1, position[1] - 1]
         up_left = [position[0] - 1, position[1] - 1]
-
 
         possible_moves = [up,down,left,right,down_left,down_right,up_left,up_right]
         # check if the king has not moved, check if the corresponding rook has not moved
@@ -84,8 +102,8 @@ class King(Piece):
        
         print(possible_moves)
         for move in possible_moves:
-            if not_off_board(move):
-                if not same_color_piece(move):
+            if self.not_off_board(move):
+                if not self.same_color_piece(move, board):
                     self.move_list += [move]
 
         #TODO: kings cannot move into check
@@ -95,20 +113,11 @@ class Queen(Piece):
 
     def valid_moves(self, board):
         current_position = [self.row, self.col]
-
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
         
         def left():
             position = [current_position[0], current_position[1] - 1]
            
-            while not_off_board(position) and not same_color_piece(position):
+            while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
                 self.move_list += [temp_position]
                 position = [position[0], position[1] - 1]
@@ -116,7 +125,7 @@ class Queen(Piece):
 
         def right():
             position = [current_position[0], current_position[1] + 1]
-            while not_off_board(position) and not same_color_piece(position):
+            while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
                 self.move_list += [temp_position]
                 position = [position[0], position[1] + 1]
@@ -124,7 +133,7 @@ class Queen(Piece):
 
         def up():
             position = [current_position[0] - 1, current_position[1]]
-            while not_off_board(position) and not same_color_piece(position):
+            while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
                 self.move_list += [temp_position]
                 position = [position[0] - 1, position[1]]
@@ -132,7 +141,7 @@ class Queen(Piece):
 
         def down():
             position = [current_position[0] + 1, current_position[1]]
-            while not_off_board(position) and not same_color_piece(position):
+            while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
                 self.move_list += [temp_position]
                 position = [position[0] + 1, position[1]]
@@ -141,8 +150,8 @@ class Queen(Piece):
 
         def diagonal_north_west():
             position = [current_position[0] - 1, current_position[1] - 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -154,8 +163,8 @@ class Queen(Piece):
         
         def diagonal_north_east():
             position = [current_position[0] - 1, current_position[1] + 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -167,8 +176,8 @@ class Queen(Piece):
 
         def diagonal_south_east():
             position = [current_position[0] + 1, current_position[1] + 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -180,8 +189,8 @@ class Queen(Piece):
 
         def diagonal_south_west():
             position = [current_position[0] + 1, current_position[1] - 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -190,8 +199,6 @@ class Queen(Piece):
                 self.move_list+= [position]
                 position = [position[0] + 1, position[1] - 1]
             return
-        
-        
 
         up()
         down()
@@ -208,15 +215,6 @@ class Knight(Piece):
 
         position = [self.row, self.col]
 
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
-        
         left_up = [position[0] - 2,position[1] - 1]
         left_down = [position[0] - 2,position[1] + 1]
         up_left = [position[0] - 1,position[1] - 2]
@@ -229,10 +227,10 @@ class Knight(Piece):
         possible_moves = [left_up,left_down,up_left,down_left,right_up,right_down,up_right,down_right]
         
         for move in possible_moves:
-            if not_off_board(move):
-                if board.board[move[0]][move[1]] and  not same_color_piece(move):
+            if self.not_off_board(move):
+                if board.board[move[0]][move[1]] and  not self.same_color_piece(move, board):
                     self.attack_list += [move]
-                elif not same_color_piece(move):
+                elif not self.same_color_piece(move, board):
                     self.move_list += [move]
 
     #TODO: build the moves checking
@@ -242,23 +240,10 @@ class Bishop(Piece):
     def valid_moves(self, board):
         current_position = [self.row, self.col]
 
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
-
-        def validate_possibility(move):
-            if not_off_board(move) and not same_color_piece(move):
-                return True
-
         def diagonal_north_west():
             position = [current_position[0] - 1, current_position[1] - 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -270,8 +255,8 @@ class Bishop(Piece):
         
         def diagonal_north_east():
             position = [current_position[0] - 1, current_position[1] + 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -283,8 +268,8 @@ class Bishop(Piece):
 
         def diagonal_south_east():
             position = [current_position[0] + 1, current_position[1] + 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -296,8 +281,8 @@ class Bishop(Piece):
 
         def diagonal_south_west():
             position = [current_position[0] + 1, current_position[1] - 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     temp_position = position
@@ -318,20 +303,11 @@ class Rook(Piece):
 
         current_position = [self.row,self.col]
 
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
-
         def left():
             position = [current_position[0], current_position[1] - 1]
            
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     self.attack_list += [position]
@@ -343,8 +319,8 @@ class Rook(Piece):
 
         def right():
             position = [current_position[0], current_position[1] + 1]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     self.attack_list += [position]
@@ -356,8 +332,8 @@ class Rook(Piece):
 
         def up():
             position = [current_position[0] - 1, current_position[1]]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     self.attack_list += [position]
@@ -369,8 +345,8 @@ class Rook(Piece):
 
         def down():
             position = [current_position[0] + 1, current_position[1]]
-            while not_off_board(position):
-                if same_color_piece(position):
+            while self.not_off_board(position):
+                if self.same_color_piece(position, board):
                     break
                 elif board.board[position[0]][position[1]]:
                     self.attack_list += [position]
@@ -404,69 +380,53 @@ class Pawn(Piece):
         current_position = [self.row, self.col]
         move_counter = 0
 
-        def not_off_board(move):
-            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                return True
-
-        def same_color_piece(move):
-            if board.board[move[0]][move[1]]:
-                if board.board[move[0]][move[1]].color == self.color:
-                    return True
-
-        def validate_possibility(move):
-            if not_off_board(move) and not same_color_piece(move):
-                return True
-
-
         if self.color == 'w':
 
             forward = [current_position[0] - 1, current_position[1]]
             if not board.board[forward[0]][forward[1]]:
-                if validate_possibility(forward):
+                if self.validate_possibility(forward, board):
                     self.move_list += [forward]
 
                 forward_two = [current_position[0] - 2, current_position[1]]
                 if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
-                    if validate_possibility(forward_two):
+                    if self.validate_possibility(forward_two, board):
                         self.move_list += [forward_two]
 
             attack_left = [current_position[0] - 1, current_position[1] - 1]
             if board.board[attack_left[0]][attack_left[1]]:
                 if board.board[attack_left[0]][attack_left[1]].color == 'b':
-                    if validate_possibility(attack_left):
+                    if self.validate_possibility(attack_left, board):
                         self.attack_list += [attack_left]
 
             attack_right = [current_position[0] - 1, current_position[1] + 1]
             if board.board[attack_right[0]][attack_right[1]]:
                 if board.board[attack_right[0]][attack_right[1]].color == 'b':
-                    if validate_possibility(attack_right):
+                    if self.validate_possibility(attack_right, board):
                         self.attack_list += [attack_right]
 
         elif self.color == 'b':
 
-
             forward = [current_position[0] + 1, current_position[1]]
             if not board.board[forward[0]][forward[1]]:
-                if validate_possibility(forward):
+                if self.validate_possibility(forward, board):
                     self.move_list += [forward]
                 forward_two = [current_position[0] + 2, current_position[1]]
                 if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
-                    if validate_possibility(forward_two):
+                    if self.validate_possibility(forward_two, board):
                         self.move_list += [forward_two]
 
             attack_left = [current_position[0] + 1, current_position[1] - 1]
             if board.board[attack_left[0]][attack_left[1]]:
                 if board.board[attack_left[0]][attack_left[1]].color == 'w':
-                    if validate_possibility(attack_left):
+                    if self.validate_possibility(attack_left, board):
                         self.attack_list += [attack_left]
 
             attack_right = [current_position[0] + 1, current_position[1] + 1]
             if board.board[attack_right[0]][attack_right[1]]:
                 if board.board[attack_right[0]][attack_right[1]].color == 'w':
-                    if validate_possibility(attack_right):
+                    if self.validate_possibility(attack_right, board):
                         self.attack_list += [attack_right]
 
-        
         return 
     #TODO: add ability to promote to queen if it reaches end of board
 
