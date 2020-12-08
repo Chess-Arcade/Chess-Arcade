@@ -1,14 +1,14 @@
-import pieces
+from pieces import Rook, Knight, Bishop, Queen, King, Pawn
 
 class Board:
 
-	def __init__(self):
-		self.board = [[0 for x in range(8)] for y in range(rows)]
-		self.reset_pieces()
+    def __init__(self):
+        self.board = [[0 for x in range(8)] for y in range(8)]
+        # self.reset_pieces()
 
-	def reset_pieces(self):
+    def reset_pieces(self):
 
-		self.board[0][0] = Rook(0, 0, 'b')
+        self.board[0][0] = Rook(0, 0, 'b')
         self.board[0][1] = Knight(0, 1, 'b')
         self.board[0][2] = Bishop(0, 2, 'b')
         self.board[0][3] = Queen(0, 3, 'b')
@@ -43,23 +43,29 @@ class Board:
         self.board[6][5] = Pawn(6, 5, 'w')
         self.board[6][6] = Pawn(6, 6, 'w')
         self.board[6][7] = Pawn(6, 7, 'w')
+    
+    def empty_board(self, x, y):
+        if self.board[x][y] == '0':
+            return True
+        else:
+            return False
 
-	def display_board(self):
+    def display_board(self):
+        pass
+        #TODO: render information with arcade
 
-		#TODO: render information with arcade
+    def check_units_moves(self, piece):
+        pass
+        #TODO: call the piece method to update move_list, then check the list and highlight open tiles blue and tiles that can be attacked on red
 
-	def check_units_moves(self, piece):
+    def check_units_attackers(self, piece):
+        pass
+        #TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
 
-		#TODO: call the piece method to update move_list, then check the list and highlight open tiles blue and tiles that can be attacked on red
+    def check_checked_status(self, color):
+        pass
+        #TODO: build something to check for a check position
 
-	def check_units_attackers(self, piece):
-
-		#TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
-
-	def check_checked_status(self, color):
-
-		#TODO: build something to check for a check position
-
-	def move(self, piece):
-
-		#TODO: build something to register user input movements and update the board
+    def move(self, start_position, end_position):
+        pass
+        #TODO: build something to register user input movements and update the board

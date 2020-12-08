@@ -1,12 +1,7 @@
 [tool.poetry]
 name = "chess-arcade"
 version = "0.1.0"
-description = "Digital Chess Game"
-authors = ["Robert Radford <RobertR928@gmail.com>"]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-arcade = "^2.4.3"
 
 [tool.poetry.dev-dependencies]
 
