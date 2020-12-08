@@ -19,6 +19,53 @@ def test_king_valid_start_moves():
     expected = [[3, 4], [5, 4], [4, 3], [4, 5], [5, 3], [5, 5], [3, 3], [3, 5]]
     assert actual == expected
 
+def test_black_king_castling():
+    board = Board()
+    king = King(0,4,'b')
+    board.board[0][4] = king
+    board.board[0][7] = Rook(0,7,'b')
+    board.board[0][0] = Rook(0,0,'b')
+    king.valid_moves(board)
+    actual = king.move_list
+    expected = [[1, 4], [0, 3], [0, 5], [1, 3], [1, 5], [0, 6], [0, 2]]
+    assert actual == expected
+
+def test_white_king_castling():
+    board = Board()
+    king = King(7,4,'b')
+    board.board[7][4] = king
+    board.board[7][7] = Rook(7,7,'w')
+    board.board[7][0] = Rook(7,0,'w')
+    king.valid_moves(board)
+    actual = king.move_list
+    expected = [[6, 4], [7, 3], [7, 5], [6, 3], [6, 5], [7, 6], [7, 2]]
+    assert actual == expected
+
+def test_black_king_cannot_castling():
+    board = Board()
+    king = King(0,4,'b')
+    board.board[0][4] = king
+    board.board[0][7] = Rook(0,7,'b')
+    board.board[0][6] = Knight(0,5,'b')
+    board.board[0][0] = Rook(0,0,'b')
+    king.valid_moves(board)
+    actual = king.move_list
+    expected = [[1, 4], [0, 3], [0, 5], [1, 3], [1, 5], [0, 2]]
+    assert actual == expected
+
+def test_white_king_cannot_castling():
+    board = Board()
+    king = King(7,4,'w')
+    board.board[7][4] = king
+    board.board[7][7] = Rook(7,7,'w')
+    board.board[7][6] = Knight(7,6,'w')
+    board.board[7][3] = Bishop(7,3,'w')
+    board.board[7][0] = Rook(7,0,'w')
+    king.valid_moves(board)
+    actual = king.move_list
+    expected = [[6, 4], [7, 5], [6, 3], [6, 5]]
+    assert actual == expected
+    
 # Pawn Tests:
 def test_valid_white_center_pawn_moves():
     board = Board()
