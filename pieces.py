@@ -64,19 +64,112 @@ class Queen(Piece):
     def valid_moves(self, board):
         current_position = [self.row, self.col]
 
-        def off_board(move):
+        def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                self.move_list += [move]
-            return
+                return True
 
         def same_color_piece(move):
-            if board.board[move[0]][move[1]].color == self.color:
-                self.move_list.pop()
+            if board.board[move[0]][move[1]]:
+                if board.board[move[0]][move[1]].color == self.color:
+                    return True
+        
+        def left():
+            position = [current_position[0], current_position[1] - 1]
+           
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0], position[1] - 1]
+            return
+
+        def right():
+            position = [current_position[0], current_position[1] + 1]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0], position[1] + 1]
+            return
+
+        def up():
+            position = [current_position[0] - 1, current_position[1]]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] - 1, position[1]]
+            return
+
+        def down():
+            position = [current_position[0] + 1, current_position[1]]
+            while not_off_board(position) and not same_color_piece(position):
+                temp_position = position
+                self.move_list += [temp_position]
+                position = [position[0] + 1, position[1]]
+            return
+
+
+        def diagonal_north_west():
+            position = [current_position[0] - 1, current_position[1] - 1]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
+                position = [position[0] - 1, position[1] - 1]
             return
         
+        def diagonal_north_east():
+            position = [current_position[0] - 1, current_position[1] + 1]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
+                position = [position[0] - 1, position[1] + 1]
+            return
 
+        def diagonal_south_east():
+            position = [current_position[0] + 1, current_position[1] + 1]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
+                position = [position[0] + 1, position[1] + 1]
+            return
 
+        def diagonal_south_west():
+            position = [current_position[0] + 1, current_position[1] - 1]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    temp_position = position
+                    self.attack_list += [temp_position]
+                    break
+                self.move_list+= [position]
+                position = [position[0] + 1, position[1] - 1]
+            return
+        
+        
 
+        up()
+        down()
+        left()
+        right()
+        diagonal_north_west()
+        diagonal_north_east()
+        diagonal_south_west()
+        diagonal_south_east()
+    
 class Knight(Piece):
 
     def valid_moves(self, board):
