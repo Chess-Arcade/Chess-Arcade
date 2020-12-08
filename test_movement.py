@@ -129,3 +129,42 @@ def test_bishop_no_moves_after_attacking():
     actual = bishop.move_list
     expected = [[3, 2], [2, 1], [1, 0], [3, 4], [2, 5], [1, 6], [0, 7], [5, 2], [6, 1], [7, 0]]
     assert actual == expected
+
+    ## Queen Test
+def test_queen_valid_moves():
+    board = Board()
+    queen = Queen(1,3,'b')
+    queen.valid_moves(board)
+    actual = queen.move_list
+    expected = [[0,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [1,2] , [1,1], [1,0], [1,4] , [1,5] , [1,6], [1,7], [0,2], [0,4], [2,2], [3,1], [4,0], [2,4], [3,5], [4,6], [5,7]]
+    assert actual == expected
+
+def test_queen_valid_moves_two():
+    board = Board()
+    queen = Queen(4,4,'b')
+    queen.valid_moves(board)
+    actual = queen.move_list
+    expected = [[3,4], [2,4], [1,4], [0,4], [5,4], [6,4], [7,4], [4,3], [4,2], [4,1], [4,0], [4,5], [4,6], [4,7], [3,3], [2,2], [1,1], [0,0], [3,5], [2,6], [1,7], [5,3], [6,2], [7,1], [5,5], [6,6], [7,7]]
+    assert actual == expected
+
+def test_queen_attacking():
+    board = Board()
+    queen = Queen(4,3,'w')
+    board.board[4][3] = queen
+    board.board[5][4] = Pawn(5,4,'b')
+    queen.valid_moves(board)
+    actual = queen.attack_list
+    expected = [[5,4]]
+    assert actual == expected
+
+def test_queen_no_moves_after_attacking():
+    board = Board()
+    queen = Queen(4,3,'w')
+    board.board[4][3] = queen
+    board.board[5][4] = Pawn(5,4,'b')
+    queen.valid_moves(board)
+    actual = queen.move_list
+    expected = [[3, 3], [2, 3], [1, 3], [0, 3], [5, 3], [6, 3], [7, 3], [4, 2], [4, 1], [4, 0], [4, 4], [4, 5], [4, 6], [4, 7], [3, 2], [2, 1], [1, 0], [3, 4], [2, 5], [1, 6], [0, 7], [5, 2], [6, 1], [7, 0]]
+    assert actual == expected
+
+
