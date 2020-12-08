@@ -38,7 +38,15 @@ class Piece:
             return True
 
     def same_color_piece(self, move, board):
-        if board.board[move[0]][move[1]]:
+        row = move[0]
+        column = move[1]
+        if row >= len(board.board):
+            raise Exception('Row out of range')
+        if column >= len(board.board[row]):
+            print(board.board[row])
+            raise Exception(f'Column: {column} out of range')
+
+        if board.board[row][column]:
             if board.board[move[0]][move[1]].color == self.color:
                 return True
 
@@ -378,7 +386,6 @@ class Pawn(Piece):
     def valid_moves(self, board):
 
         current_position = [self.row, self.col]
-        move_counter = 0
 
         if self.color == 'w':
 
@@ -388,7 +395,7 @@ class Pawn(Piece):
                     self.move_list += [forward]
 
                 forward_two = [current_position[0] - 2, current_position[1]]
-                if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
+                if not self.move_counter and not board.board[forward_two[0]][forward_two[1]]:
                     if self.validate_possibility(forward_two, board):
                         self.move_list += [forward_two]
 
@@ -411,7 +418,7 @@ class Pawn(Piece):
                 if self.validate_possibility(forward, board):
                     self.move_list += [forward]
                 forward_two = [current_position[0] + 2, current_position[1]]
-                if not move_counter and not board.board[forward_two[0]][forward_two[1]]:
+                if not self.move_counter and not board.board[forward_two[0]][forward_two[1]]:
                     if self.validate_possibility(forward_two, board):
                         self.move_list += [forward_two]
 

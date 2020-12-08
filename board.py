@@ -77,31 +77,56 @@ class Board:
         '''
         start = self.board[start_position[0]][start_position[1]]
         end = self.board[end_position[0]][end_position[1]]
+        
+
+        if not start:
+            print('Please choose a piece on the board')
+            return        
+        if not start.color == self.player_turn:
+            print('Other player\'s turn')   
+            return
 
         if start.color == self.player_turn: # does the turn match the piece color
-            if not self.end: # does the end position contain a unit 
-                for valid_move in start.move_list: # go through the valid moves
-                    if valid_move == end_position: # if a valid move matches the end position, then do the move
-                        self.end = start
-                        del start
-                        self.end.valid_moves(self)
-                        self.end.move_counter += 1
+            if not end: # does the end position contain a unit 
+               
+                for move in start.move_list: # go through the valid moves
+                    
+                    if move == end_position: # if a valid move matches the end position, then do the move
+                        start.row = end_position[0]
+                        start.col = end_position[1]
 
-            else: # if the end position is not empty (i.e. there is an opponent on that square
-                for valid_attack in start.attack_list: # check the valid attack
-                    if valid_attack == end_position: # if the end position is a valid attack, move the piece and remove the opponent's piece
-                        del end
-                        end = start
-                        end.valid_moves(self)
-                        del start
-                        end.move_counter += 1
-            
-            # no matter what happens, if a move is completed change the player turn
-            if self.player_turn == 'b':
-                self.player_turn = 'w'
-            elif self.player_turn == 'w':
-                self.player_turn = 'b'
+                        self.board[end_position[0]][end_position[1]] =  start
+                        self.board[start_position[0]][start_position[1]] = 0
+
+                        self.board[end_position[0]][end_position[1]].move_counter += 1
+                        self.board[end_position[0]][end_position[1]].move_list = []
+                        self.board[end_position[0]][end_position[1]].valid_moves(self)
+                        if self.player_turn == 'w':
+                            self.player_turn = 'b'
+                        elif self.player_turn == 'b':
+                            self.player_turn = 'w'
+
+            elif end: # if the end position is not empty (i.e. there is an opponent on that square)
                 
+                for attack in start.attack_list: # check the valid attacks
+                    
+                    if attack == end_position: # if the end position is a valid attack, move the piece and remove the opponent's piece
+                        self.board[end_position[0]][end_position[1]] = 0
+                        start.row = end_position[0]
+                        start.col = end_position[1]
+                        self.board[end_position[0]][end_position[1]] =  start
+                        self.board[start_position[0]][start_position[1]] = 0
+                        self.board[end_position[0]][end_position[1]].move_list = []
+                        self.board[end_position[0]][end_position[1]].move_counter += 1
+                        self.board[end_position[0]][end_position[1]].valid_moves(self)
+                        if self.player_turn == 'w':
+                            self.player_turn = 'b'
+                        elif self.player_turn == 'b':
+                            self.player_turn = 'w'
+            else: 
+                print('Invalid move, try another move')
+            # no matter what happens, if a move is completed change the player turn
+
         #TODO: validate for checking and not moving into check
         #TODO: update move_counter or remove move_counter
         #TODO: update move_list with the moves from the new position
