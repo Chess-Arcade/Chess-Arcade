@@ -66,6 +66,6 @@ class Board:
         pass
         #TODO: build something to check for a check position
 
-    def move(self, piece):
+    def move(self, start_position, end_position):
         pass
         #TODO: build something to register user input movements and update the board
