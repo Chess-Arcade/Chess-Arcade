@@ -23,6 +23,7 @@ class Piece:
         self.color = color
         self.move_list = []
         self.attack_list = []
+        self.move_counter = 0
 
 class King(Piece):
 
@@ -30,16 +31,14 @@ class King(Piece):
     def valid_moves(self, board):
         position = [self.row, self.col]
 
-        def off_board(move):
+        def not_off_board(move):
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                self.move_list += [move]
-            return
+                return True
 
         def same_color_piece(move):
             if board.board[move[0]][move[1]]:
                 if board.board[move[0]][move[1]].color == self.color:
-                    self.move_list.pop()
-            return
+                    return True
 
         up = [position[0] - 1, position[1]]
         down = [position[0] + 1, position[1]]
@@ -49,12 +48,45 @@ class King(Piece):
         up_right = [position[0] - 1, position[1] + 1]
         down_left = [position[0] + 1, position[1] - 1]
         up_left = [position[0] - 1, position[1] - 1]
-        
-        possible_moves = [up,down,left,right,down_left,down_right,up_left,up_right]
 
+
+        possible_moves = [up,down,left,right,down_left,down_right,up_left,up_right]
+        # check if the king has not moved, check if the corresponding rook has not moved
+        # check that the tiles the king is moving over are not cover
+        # check if the tiles the king is moving over are not under attack
+
+        if self.move_counter == 0:
+        #black king castling
+            if board.board[0][7]:
+                if board.board[0][7].move_counter == 0:
+                    if not board.board[0][5] and not board.board[0][6]:
+                        castle_right = [position[0],position[1] + 2]
+                        possible_moves.append(castle_right)
+
+            if board.board[0][0]:
+                if board.board[0][0].move_counter == 0:
+                    if not board.board[0][1] and not board.board[0][2] and not board.board[0][3]:
+                        castle_left = [position[0],position[1] - 2]
+                        possible_moves += [castle_left]
+            
+        #white king
+            if board.board[7][7]: 
+                if board.board[7][7].move_counter == 0:
+                    if not board.board[7][6] and not board.board[7][5]:
+                        castle_right = [position[0],position[1] + 2]
+                        possible_moves.append(castle_right)
+
+            if board.board[7][0]:
+                if board.board[7][0].move_counter == 0:
+                    if not board.board[7][1] and not board.board[7][2] and not board.board[7][3]: 
+                        castle_left = [position[0],position[1] - 2]
+                        possible_moves.append(castle_left)
+       
+        print(possible_moves)
         for move in possible_moves:
-            off_board(move)
-            same_color_piece(move)
+            if not_off_board(move):
+                if not same_color_piece(move):
+                    self.move_list += [move]
 
         #TODO: kings cannot move into check
         #TODO: Castling to the left and right if the king has not moved and the castling rook has not moved
@@ -193,11 +225,15 @@ class Knight(Piece):
         right_down = [position[0] + 2,position[1] + 1]
         up_right = [position[0] + 1,position[1] - 2]
         down_right = [position[0] + 1,position[1] + 2]
-        moves = [left_up,left_down,up_left,down_left,right_up,right_down,up_right,down_right]
+
+        possible_moves = [left_up,left_down,up_left,down_left,right_up,right_down,up_right,down_right]
         
-        for move in moves:
-            if not_off_board(move) and not same_color_piece(move):
-                self.move_list += [move]
+        for move in possible_moves:
+            if not_off_board(move):
+                if board.board[move[0]][move[1]] and  not same_color_piece(move):
+                    self.attack_list += [move]
+                elif not same_color_piece(move):
+                    self.move_list += [move]
 
     #TODO: build the moves checking
 
@@ -270,10 +306,7 @@ class Bishop(Piece):
                 self.move_list+= [position]
                 position = [position[0] + 1, position[1] - 1]
             return
-        
-        
-
-
+    
         diagonal_north_west()
         diagonal_north_east()
         diagonal_south_east()
@@ -297,33 +330,53 @@ class Rook(Piece):
         def left():
             position = [current_position[0], current_position[1] - 1]
            
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                    break
+                # temp_position = position
+                self.move_list += [position]
                 position = [position[0], position[1] - 1]
             return
 
         def right():
             position = [current_position[0], current_position[1] + 1]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                    break
+                # temp_position = position
+                self.move_list += [position]
                 position = [position[0], position[1] + 1]
             return
 
         def up():
             position = [current_position[0] - 1, current_position[1]]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                    break
+                # temp_position = position
+                self.move_list += [position]
                 position = [position[0] - 1, position[1]]
             return
 
         def down():
             position = [current_position[0] + 1, current_position[1]]
-            while not_off_board(position) and not same_color_piece(position):
-                temp_position = position
-                self.move_list += [temp_position]
+            while not_off_board(position):
+                if same_color_piece(position):
+                    break
+                elif board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                    break
+                # temp_position = position
+                self.move_list += [position]
                 position = [position[0] + 1, position[1]]
             return
 
