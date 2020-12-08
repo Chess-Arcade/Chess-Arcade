@@ -62,6 +62,31 @@ class Board:
         pass
         #TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
 
-    def check_checked_status(self, color):
-        pass
+    def check_checked_status(self):
+        self.whiteKingLocation = King(7,4, 'w')
+        self.blackKingLocation = King(0,4, 'b')
+        if King.possible_moves == board.board[7][4]
+            self.whiteKingLocation = (self.row.move, self.col.move)
+                    # Update kings location
+        elif move.possible_moves == board.board.[0][4]
+            self.blackKingLocation = (self.row.move, self.col.move)
+
+
+        if self.whiteKingLocation:
+            return self.under_attack(self.whiteKingLocation)[0], self.whiteKingLocation[1])
+
+        else:
+            return self.under_attack(self.blackKingLocation)[0], self.blackKingLocation[1])
+
         #TODO: build something to check for a check position
+
+        def under_attack(self, row, col):
+
+            self.possible_moves = not self.possible_moves #Switch to oppents turn
+            opp_moves = self.possible_moves
+            self.possible_moves = not self.possible_moves
+            for move in opp_moves:
+                if move.row == row and move.col == col:#square is under attack
+                self.possible_moves = not self.possible_moves #switch turns back
+                return True
+            return False

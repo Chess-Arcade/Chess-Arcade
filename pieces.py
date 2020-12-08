@@ -1,5 +1,5 @@
 import os
-# from board import Board
+from board import Board
 
 # b_bishop = pygame.image.load(os.path.join('assets', 'black_bishop.png'))
 # b_king = pygame.image.load(os.path.join('assets', 'black_king.png'))
@@ -88,7 +88,7 @@ class King(Piece):
                 if not same_color_piece(move):
                     self.move_list += [move]
 
-        #TODO: kings cannot move into check
+        #TODO: kings cannot move into check    
         #TODO: Castling to the left and right if the king has not moved and the castling rook has not moved
 
 class Queen(Piece):
