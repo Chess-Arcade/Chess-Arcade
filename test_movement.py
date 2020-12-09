@@ -249,7 +249,6 @@ def test_queen_no_moves_after_attacking():
     expected = [[3, 3], [2, 3], [1, 3], [0, 3], [5, 3], [6, 3], [7, 3], [4, 2], [4, 1], [4, 0], [4, 4], [4, 5], [4, 6], [4, 7], [3, 2], [2, 1], [1, 0], [3, 4], [2, 5], [1, 6], [0, 7], [5, 2], [6, 1], [7, 0]]
     assert actual == expected
 
-# Test the move method in board class
 def test_move_method_for_pawn():
     board = Board()
     pawn = Pawn(6,1,'w')
@@ -308,6 +307,7 @@ def test_multiple_moves():
     assert actual1 == expected1
     assert actual2 == expected2
 
+# Test the move method in board class
 ## Check 
 
 def test_check_checked_checking_true():
@@ -323,3 +323,12 @@ def test_check_checked_checking_true():
     assert actual1 == expected1
     assert actual2 == expected2
 
+def test_check_checked_checking_true_two():
+    board = Board()
+    board.board[3][1] = King(3,1,"w")
+    rook = Rook(3,7,"b")
+    board.board[3][7] = rook
+    rook.valid_moves(board)
+    actual = board.check_status()
+    expected = 'w'
+    assert actual == expected
