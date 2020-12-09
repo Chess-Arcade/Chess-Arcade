@@ -332,3 +332,50 @@ def test_check_checked_checking_true_two():
     actual = board.check_status()
     expected = 'w'
     assert actual == expected
+
+def test_checkmate_true():
+    board = Board()
+    king = King(7,0,'w')
+    board.board[7][0] = king
+    queen = Queen(6,0,'b')
+    board.board[6][0] = queen
+    rook = Rook(5,0,'b')
+    board.board[5][0] = rook
+    king.valid_moves
+    actual = board.checkmate_status()
+    expected = True
+    assert actual == expected
+
+def test_checkmate_false():
+    board = Board()
+    king = King(7,0,'w')
+    board.board[7][0] = king
+    rook = Rook(5,0,'b')
+    board.board[5][0] = rook
+    king.valid_moves(board)
+    actual = board.checkmate_status()
+    expected = False
+    assert actual == expected
+
+def test_scholars_mate():
+    board = Board()
+    board.reset_pieces()
+    board.board[6][4].valid_moves(board)
+    board.move([6,4],[4,4])
+    board.board[1][4].valid_moves(board)
+    board.move([1,4],[3,4])
+    board.board[7][3].valid_moves(board)
+    board.move([7,3],[5,5])
+    board.board[0][1].valid_moves(board)
+    board.move([0,1],[2,2])
+    board.board[7][5].valid_moves(board)
+    board.move([7,5],[4,2])
+    board.board[0][5].valid_moves(board)
+    board.move([0,5],[4,1])
+    board.move([5,5],[1,5])
+    print(board.board[1][5])
+    print(board.board[0][4].move_list)
+    print(board.check_status())
+    actual = board.checkmate_status()
+    expected = True
+    assert actual == expected
