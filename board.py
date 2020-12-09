@@ -1,7 +1,9 @@
 from pieces import Rook, Knight, Bishop, Queen, King, Pawn
 
 class Board:
-
+    '''
+    The board class keeps track of all the pieces in on the 8 by 8 chess board grid. It keeps track of whose turn it is
+    '''
     def __init__(self):
         self.board = [[0 for x in range(8)] for y in range(8)]
         self.player_turn = 'w'
@@ -61,8 +63,34 @@ class Board:
         pass
         #TODO: call the piece method to update move_list, then check the list and highlight open tiles blue and tiles that can be attacked on red
 
-    def create_piece(self, piece):
-        pass
+    def checkmate_status(self):
+        all_moves = []
+        current_positions = []
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j]:
+                    if self.player_turn == self.board[i][j].color:
+                        if self.board[i][j].move_list:
+                            for move in self.board[i][j].move_list:
+                                current_positions += [[i,j]]
+                                all_moves += [move]
+                        if self.board[i][j].attack_list:
+                            for move in self.board[i][j].attack_list:
+                                current_positions += [[i,j]]
+                                all_moves += [move]
+        
+        for i in range(len(all_moves)):            
+            temp_board = Board()
+            print(current_positions[i][0])
+            temp_board.move([current_positions[i][0], current_positions[i][1]], [all_moves[i][0], all_moves[i][1]])
+            if not temp_board.check_status():
+                return False
+        return True
+        # make temp list of all moves
+        # run each move through a temporary board
+        # check status of that temporary board
+        # if any status comes back false, then checkmate_status comes back false
+
         #TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
 
     def check_status(self):
@@ -75,16 +103,12 @@ class Board:
                 for j in range(0,8):
                     if self.board[i][j]:
                         if type(self.board[i][j]) == King and self.board[i][j].color == 'w':
-                            print("self.board[i][j]")
                             self.white_king_location = [i,j]
                         elif type(self.board[i][j]) == King and self.board[i][j].color == 'b':
-                            print("self.board[i][j]")
                             self.black_king_location = [i,j]
                         elif self.board[i][j].color == "b":
-                            print("self.board[i][j]")
                             temp_black_attack_list += self.board[i][j].attack_list 
                         elif self.board[i][j].color == "w":
-                            print("self.board[i][j]")
                             temp_white_attack_list += self.board[i][j].attack_list 
             
             for attacks in temp_black_attack_list:
@@ -143,13 +167,13 @@ class Board:
                     
                     if attack == end_position: # if the end position is a valid attack, move the piece and remove the opponent's piece
                         self.board[end_position[0]][end_position[1]] = 0
-                        start.row = end_position[0]
-                        start.col = end_position[1]
-                        self.board[end_position[0]][end_position[1]] =  start
-                        self.board[start_position[0]][start_position[1]] = 0
-                        self.board[end_position[0]][end_position[1]].move_list = []
-                        self.board[end_position[0]][end_position[1]].move_counter += 1
-                        self.board[end_position[0]][end_position[1]].valid_moves(self)
+                        start.row = end_position[0] # updated the current row for the piece
+                        start.col = end_position[1] # update the current column for the piece
+                        self.board[end_position[0]][end_position[1]] =  start # append the board at the end position with the piece
+                        self.board[start_position[0]][start_position[1]] = 0 # clear the startin square
+                        self.board[end_position[0]][end_position[1]].move_list = [] # clear the previous move lists
+                        self.board[end_position[0]][end_position[1]].move_counter += 1 # increment the counter
+                        self.board[end_position[0]][end_position[1]].valid_moves(self) # update the valid moves
                         if self.player_turn == 'w':
                             self.player_turn = 'b'
                         elif self.player_turn == 'b':
