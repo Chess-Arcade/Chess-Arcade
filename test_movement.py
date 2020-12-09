@@ -66,6 +66,16 @@ def test_white_king_cannot_castling():
     expected = [[6, 4], [7, 5], [6, 3], [6, 5]]
     assert actual == expected
 
+def test_king_attack():
+    board = Board()
+    king = King(4,4,'w')
+    board.board[4][4] = king
+    board.board[3][4] = Pawn(3,4,'b')
+    king.valid_moves(board)
+    actual = king.attack_list
+    expected = [[3,4]]
+    assert actual == expected
+
 # Pawn Tests:
 def test_valid_white_center_pawn_moves():
     board = Board()
@@ -223,9 +233,10 @@ def test_queen_attacking():
     queen = Queen(4,3,'w')
     board.board[4][3] = queen
     board.board[5][4] = Pawn(5,4,'b')
+    board.board[2][3] = Pawn(2,3,'b')
     queen.valid_moves(board)
     actual = queen.attack_list
-    expected = [[5,4]]
+    expected = [[2, 3], [5,4]]
     assert actual == expected
 
 def test_queen_no_moves_after_attacking():
@@ -296,3 +307,19 @@ def test_multiple_moves():
     expected2 = Rook
     assert actual1 == expected1
     assert actual2 == expected2
+
+## Check 
+
+def test_check_checked_checking_true():
+    board = Board()
+    board.board[1][1] = King(1,1,"w")
+    rook = Rook(1,7,"b")
+    board.board[1][7] = rook
+    rook.valid_moves(board)
+    actual1 = board.check_status()
+    expected1 = 'w'
+    actual2 = rook.attack_list
+    expected2 = [[1,1]]
+    assert actual1 == expected1
+    assert actual2 == expected2
+
