@@ -5,6 +5,8 @@ class Board:
     def __init__(self):
         self.board = [[0 for x in range(8)] for y in range(8)]
         self.player_turn = 'w'
+        self.white_king_location = 0
+        self.black_king_location = 0
         # self.reset_pieces()
 
     def reset_pieces(self):
@@ -63,9 +65,38 @@ class Board:
         pass
         #TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
 
-    def check_checked_status(self, color):
-        pass
-        #TODO: build something to check for a check position
+    def check_checked_status(self):
+
+        temp_black_attack_list = []
+        temp_white_attack_list = []
+
+
+        try:
+            for i in range(0,8):
+                for j in range(0,8):
+                    if self.board[i][j]:
+                        if type(self.board[i][j]) == King and self.board[i][j].color == 'w':
+                            print("self.board[i][j]")
+                            self.white_king_location = [i,j]
+                        elif type(self.board[i][j]) == King and self.board[i][j].color == 'b':
+                            print("self.board[i][j]")
+                            self.black_king_location = [i,j]
+                        elif self.board[i][j].color == "b":
+                            print("self.board[i][j]")
+                            temp_black_attack_list += self.board[i][j].attack_list 
+                        elif self.board[i][j].color == "w":
+                            print("self.board[i][j]")
+                            temp_white_attack_list += self.board[i][j].attack_list 
+            
+            for attacks in temp_black_attack_list:
+                if attacks == self.white_king_location:
+                    return True
+            for attacks in temp_white_attack_list:
+                if attacks == self.black_king_location:
+                    return True
+        except:
+            return False
+        
 
     def move(self, start_position, end_position):
         '''

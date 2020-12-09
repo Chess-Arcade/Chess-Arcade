@@ -114,7 +114,7 @@ class King(Piece):
                 if not self.same_color_piece(move, board):
                     self.move_list += [move]
 
-        #TODO: kings cannot move into check
+        #TODO: kings cannot move into check    
         #TODO: Castling to the left and right if the king has not moved and the castling rook has not moved
 
 class Queen(Piece):
