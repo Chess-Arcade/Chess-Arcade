@@ -54,6 +54,17 @@ class Piece:
         if self.not_off_board(move) and not self.same_color_piece(move, board):
             return True
 
+    def test_if_your_king_is_in_check(self, move, board):
+        '''
+        Go through the whole board and find out if the attempted move results in the same color king being in check
+        Returns a truthy if king is under attack
+        '''
+
+        temp_board = board
+        temp_board.move([self.row, self.col],[move[0], move[1]])
+        temp_board.check_status()
+
+        
 class King(Piece):
     '''
     The king can move one space in any direction as long as there is no piece of the same color on that square, 
@@ -111,7 +122,9 @@ class King(Piece):
         print(possible_moves)
         for move in possible_moves:
             if self.not_off_board(move):
-                if not self.same_color_piece(move, board):
+                if board.board[move[0]][move[1]] and not self.same_color_piece(move, board):
+                    self.attack_list += [move]
+                elif not self.same_color_piece(move, board):
                     self.move_list += [move]
 
         #TODO: kings cannot move into check    
@@ -124,10 +137,13 @@ class Queen(Piece):
         
         def left():
             position = [current_position[0], current_position[1] - 1]
-           
             while self.not_off_board(position) and not self.same_color_piece(position, board):
-                temp_position = position
-                self.move_list += [temp_position]
+                if self.color != self.test_if_your_king_is_in_check(position, board):
+                    temp_position = position
+                    if board.board[position[0]][position[1]]:
+                        self.attack_list += [position]
+                    else:
+                        self.move_list += [temp_position]
                 position = [position[0], position[1] - 1]
             return
 
@@ -135,7 +151,10 @@ class Queen(Piece):
             position = [current_position[0], current_position[1] + 1]
             while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
-                self.move_list += [temp_position]
+                if board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                else:
+                    self.move_list += [temp_position]
                 position = [position[0], position[1] + 1]
             return
 
@@ -143,7 +162,10 @@ class Queen(Piece):
             position = [current_position[0] - 1, current_position[1]]
             while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
-                self.move_list += [temp_position]
+                if board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                else:
+                    self.move_list += [temp_position]
                 position = [position[0] - 1, position[1]]
             return
 
@@ -151,7 +173,10 @@ class Queen(Piece):
             position = [current_position[0] + 1, current_position[1]]
             while self.not_off_board(position) and not self.same_color_piece(position, board):
                 temp_position = position
-                self.move_list += [temp_position]
+                if board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                else:
+                    self.move_list += [temp_position]
                 position = [position[0] + 1, position[1]]
             return
 

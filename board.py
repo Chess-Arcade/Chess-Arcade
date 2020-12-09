@@ -65,11 +65,10 @@ class Board:
         pass
         #TODO: build checks for units that can currently attack the selected piece and highlight the tile orange
 
-    def check_checked_status(self):
+    def check_status(self):
 
         temp_black_attack_list = []
         temp_white_attack_list = []
-
 
         try:
             for i in range(0,8):
@@ -90,15 +89,16 @@ class Board:
             
             for attacks in temp_black_attack_list:
                 if attacks == self.white_king_location:
-                    return True
+                    return 'w'
             for attacks in temp_white_attack_list:
                 if attacks == self.black_king_location:
-                    return True
+                    return 'b'
         except:
             return False
         
 
     def move(self, start_position, end_position):
+
         '''
         To move a piece, we first make sure that the piece color matches the players turn color (white should move white
         pieces). If there is a piece on the selected end position, then we validate moves from the attack list and replace 
@@ -106,9 +106,9 @@ class Board:
         simply copy that piece onto the end position and remove it from the start position. After every move, we must change 
         the current players turn to reflect the actual current colors turn.
         '''
+
         start = self.board[start_position[0]][start_position[1]]
         end = self.board[end_position[0]][end_position[1]]
-        
 
         if not start:
             print('Please choose a piece on the board')
