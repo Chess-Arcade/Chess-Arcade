@@ -296,3 +296,16 @@ def test_multiple_moves():
     expected2 = Rook
     assert actual1 == expected1
     assert actual2 == expected2
+
+## Check 
+
+def test_check_checked_checking_true():
+    board = Board()
+    board.board[1][1] = King(1,1,"w")
+    rook = Rook(1,7,"b")
+    board.board[1][7] = rook
+    rook.valid_moves(board)
+    actual = board.check_checked_status()
+    expected = True
+    assert actual == expected
+
