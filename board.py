@@ -74,18 +74,19 @@ class Board:
         try:
             for i in range(0,8):
                 for j in range(0,8):
-                    if type(self.board[i][j]) == King and self.board[i][j].color == 'w':
-                        print("self.board[i][j]")
-                        self.white_king_location = [i,j]
-                    elif type(self.board[i][j]) == King and self.board[i][j].color == 'b':
-                        print("self.board[i][j]")
-                        self.black_king_location = [i,j]
-                    elif self.board[i][j].color == "b":
-                        print("self.board[i][j]")
-                        temp_black_attack_list += self.board[i][j].attack_list 
-                    elif self.board[i][j].color == "w":
-                        print("self.board[i][j]")
-                        temp_white_attack_list += self.board[i][j].attack_list 
+                    if self.board[i][j]:
+                        if type(self.board[i][j]) == King and self.board[i][j].color == 'w':
+                            print("self.board[i][j]")
+                            self.white_king_location = [i,j]
+                        elif type(self.board[i][j]) == King and self.board[i][j].color == 'b':
+                            print("self.board[i][j]")
+                            self.black_king_location = [i,j]
+                        elif self.board[i][j].color == "b":
+                            print("self.board[i][j]")
+                            temp_black_attack_list += self.board[i][j].attack_list 
+                        elif self.board[i][j].color == "w":
+                            print("self.board[i][j]")
+                            temp_white_attack_list += self.board[i][j].attack_list 
             
             for attacks in temp_black_attack_list:
                 if attacks == self.white_king_location:
