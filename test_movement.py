@@ -379,3 +379,5 @@ def test_scholars_mate():
     actual = board.checkmate_status()
     expected = True
     assert actual == expected
+
+#

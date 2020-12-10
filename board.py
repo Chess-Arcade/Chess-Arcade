@@ -136,7 +136,8 @@ class Board:
 
         if not start:
             print('Please choose a piece on the board')
-            return        
+            return   
+                 
         if not start.color == self.player_turn:
             print('Other player\'s turn')   
             return
