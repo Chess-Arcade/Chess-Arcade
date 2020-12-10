@@ -1,3 +1,4 @@
+import pytest
 from board import Board 
 from pieces import Pawn, Rook, King, Queen, Knight, Bishop
 
@@ -333,6 +334,7 @@ def test_check_checked_checking_true_two():
     expected = 'w'
     assert actual == expected
 
+@pytest.mark.skip('pending')
 def test_checkmate_true():
     board = Board()
     king = King(7,0,'w')
@@ -341,15 +343,39 @@ def test_checkmate_true():
     board.board[6][0] = queen
     rook = Rook(5,0,'b')
     board.board[5][0] = rook
+    queen.valid_moves(board)
+    rook.valid_moves(board)
+
+    print('king position',queen.attack_list)
     king.valid_moves(board)
     actual = board.checkmate_status()
+    print('king attacks', king.attack_list)
+    print('rook attacks', rook.attack_list)
     expected = True
+    assert actual == expected
+
+def test_psuedo_move():
+    board = Board()
+    king = King(7,0,'w')
+    board.board[7][0] = king
+    queen = Queen(6,0,'b')
+    board.board[6][0] = queen
+    # rook = Rook(5,0,'b')
+    # board.board[5][0] = rook
+    queen.valid_moves(board)
+    # rook.valid_moves(board)
+    king.valid_moves(board)
+   
+    actual = king.psuedo_move([6,0],board)
+    print('rook attacks', rook.attack_list)
+    expected = False
     assert actual == expected
 
 def test_checkmate_false():
     board = Board()
     king = King(7,0,'w')
     board.board[7][0] = king
+    print(board.board[7][0])
     rook = Rook(5,0,'b')
     board.board[5][0] = rook
     king.valid_moves(board)
