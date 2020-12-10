@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 # from board import Board
 
 # b_bishop = pygame.image.load(os.path.join('assets', 'black_bishop.png'))
@@ -40,11 +41,11 @@ class Piece:
     def same_color_piece(self, move, board):
         row = move[0]
         column = move[1]
-        if row >= len(board.board):
-            raise Exception('Row out of range')
-        if column >= len(board.board[row]):
-            print(board.board[row])
-            raise Exception(f'Column: {column} out of range')
+        # if row >= len(board.board):
+        #     raise Exception('Row out of range')
+        # if column >= len(board.board[row]):
+        #     print(board.board[row])
+        #     return f'Column:{column} out of range'
 
         if board.board[row][column]:
             if board.board[move[0]][move[1]].color == self.color:
@@ -54,17 +55,37 @@ class Piece:
         if self.not_off_board(move) and not self.same_color_piece(move, board):
             return True
 
-    def test_if_your_king_is_in_check(self, move, board):
+    def test_if_your_king_is_in_check(self, board):
         '''
         Go through the whole board and find out if the attempted move results in the same color king being in check
         Returns a truthy if king is under attack
         '''
+        # take out valid moves that end in king in check
 
-        temp_board = board
-        temp_board.move([self.row, self.col],[move[0], move[1]])
-        temp_board.check_status()
+        def psuedo_move(move):
+            temp_board = deepcopy(board)
+            temp_board.board[move[0]][move[1]] = temp_board.board[self.row][self.col]
+            temp_board.board[self.row][self.row] = 0
 
-        
+            for i in range(8):
+                for j in range(8):
+                    if temp_board.board[i][j]:
+                        if temp_board.board[i][j].color != self.color:
+                            temp_board.board[i][j].valid_moves(temp_board)
+
+            if self.color != temp_board.check_status():
+                return True
+            return False
+
+        survivors = []
+
+        for move in self.move_list:
+            if psuedo_move(move):
+                survivors.append(move) 
+ 
+        self.move_list = survivors
+        # return self.move_list
+       
 class King(Piece):
     '''
     The king can move one space in any direction as long as there is no piece of the same color on that square, 
@@ -138,12 +159,12 @@ class Queen(Piece):
         def left():
             position = [current_position[0], current_position[1] - 1]
             while self.not_off_board(position) and not self.same_color_piece(position, board):
-                if self.color != self.test_if_your_king_is_in_check(position, board):
-                    temp_position = position
-                    if board.board[position[0]][position[1]]:
-                        self.attack_list += [position]
-                    else:
-                        self.move_list += [temp_position]
+                # if self.color != self.test_if_your_king_is_in_check(position, board):
+                temp_position = position
+                if board.board[position[0]][position[1]]:
+                    self.attack_list += [position]
+                else:
+                    self.move_list += [temp_position]
                 position = [position[0], position[1] - 1]
             return
 

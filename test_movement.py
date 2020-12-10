@@ -255,10 +255,10 @@ def test_move_method_for_pawn():
     pawn.valid_moves(board)
     board.board[6][1] = pawn
     board.move([6,1],[4,1])
-    actual1 = type(board.board[4][1])
-    expected1 = Pawn
-    actual2 = type(board.board[6][1])
-    expected2 = int
+    actual1 = isinstance(board.board[4][1],Pawn)
+    expected1 = True
+    actual2 = isinstance(board.board[6][1], Pawn)
+    expected2 = False
     actual3 = board.board[4][1].move_list
     expected3 = [[3, 1]]
     actual4 = board.player_turn
@@ -277,10 +277,10 @@ def test_capture_a_piece():
     w_pawn.valid_moves(board)
     board.move([6,1],[5,2])
     print(w_pawn.attack_list)
-    actual1 = type(board.board[5][2])
-    expected1 = Pawn
-    actual2 = type(board.board[6][1])
-    expected2 = int
+    actual1 = isinstance(board.board[5][2], Pawn)
+    expected1 = True
+    actual2 = isinstance(board.board[6][1], Pawn)
+    expected2 = False
     actual3 = board.board[5][2].move_list
     expected3 = [[4, 2]]
     actual4 = board.player_turn
@@ -299,11 +299,11 @@ def test_multiple_moves():
     w_rook.valid_moves(board)
     b_rook.valid_moves(board)
     board.move([7,3],[0,3])
-    actual1 = type(board.board[0][3])
-    expected1 = Rook
+    actual1 = isinstance(board.board[0][3], Rook)
+    expected1 = True
     board.move([0,0],[0,2])
-    actual2 = type(board.board[0][2])
-    expected2 = Rook
+    actual2 = isinstance(board.board[0][2], Rook)
+    expected2 = True
     assert actual1 == expected1
     assert actual2 == expected2
 
@@ -341,7 +341,7 @@ def test_checkmate_true():
     board.board[6][0] = queen
     rook = Rook(5,0,'b')
     board.board[5][0] = rook
-    king.valid_moves
+    king.valid_moves(board)
     actual = board.checkmate_status()
     expected = True
     assert actual == expected
@@ -357,25 +357,37 @@ def test_checkmate_false():
     expected = False
     assert actual == expected
 
-def test_scholars_mate():
+# def test_scholars_mate():
+#     board = Board()
+#     board.reset_pieces()
+#     board.board[6][4].valid_moves(board)
+#     board.move([6,4],[4,4])
+#     board.board[1][4].valid_moves(board)
+#     board.move([1,4],[3,4])
+#     board.board[7][3].valid_moves(board)
+#     board.move([7,3],[5,5])
+#     board.board[0][1].valid_moves(board)
+#     board.move([0,1],[2,2])
+#     board.board[7][5].valid_moves(board)
+#     board.move([7,5],[4,2])
+#     board.board[0][5].valid_moves(board)
+#     board.move([0,5],[4,1])
+#     board.move([5,5],[1,5])
+#     actual = board.checkmate_status()
+#     expected = True
+#     assert actual == expected
+
+def test_pins():
     board = Board()
-    board.reset_pieces()
-    board.board[6][4].valid_moves(board)
-    board.move([6,4],[4,4])
-    board.board[1][4].valid_moves(board)
-    board.move([1,4],[3,4])
-    board.board[7][3].valid_moves(board)
-    board.move([7,3],[5,5])
-    board.board[0][1].valid_moves(board)
-    board.move([0,1],[2,2])
-    board.board[7][5].valid_moves(board)
-    board.move([7,5],[4,2])
-    board.board[0][5].valid_moves(board)
-    board.move([0,5],[4,1])
-    board.move([5,5],[1,5])
-    print(board.board[1][5])
-    print(board.board[0][4].move_list)
-    print(board.check_status())
-    actual = board.checkmate_status()
-    expected = True
+    king = King(7,4,'w')
+    board.board[7][4] = king
+    bishop = Bishop(6,4,'w')
+    board.board[6][4] = bishop
+    b_rook = Rook(5,4,'b')
+    board.board[5][4] = b_rook
+    bishop.valid_moves(board)
+    b_rook.valid_moves(board)
+    bishop.test_if_your_king_is_in_check(board)
+    actual = bishop.move_list
+    expected = []
     assert actual == expected
