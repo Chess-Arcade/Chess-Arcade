@@ -59,7 +59,7 @@ class Piece:
         temp_board = deepcopy(board)
         current_piece = temp_board.board[self.row][self.col]
         temp_board.board[move[0]][move[1]] = current_piece
-        temp_board.board[self.row][self.row] = 0
+        temp_board.board[self.row][self.col] = 0
 
         for i in range(8):
             for j in range(8):
@@ -463,16 +463,18 @@ class Pawn(Piece):
                         self.move_list += [forward_two]
 
             attack_left = [current_position[0] - 1, current_position[1] - 1]
-            if board.board[attack_left[0]][attack_left[1]]:
-                if board.board[attack_left[0]][attack_left[1]].color == 'b':
-                    if self.validate_possibility(attack_left, board):
-                        self.attack_list += [attack_left]
+            if current_position[1] != 0:
+                if board.board[attack_left[0]][attack_left[1]]:
+                    if board.board[attack_left[0]][attack_left[1]].color == 'b':
+                        if self.validate_possibility(attack_left, board):
+                            self.attack_list += [attack_left]
 
             attack_right = [current_position[0] - 1, current_position[1] + 1]
-            if board.board[attack_right[0]][attack_right[1]]:
-                if board.board[attack_right[0]][attack_right[1]].color == 'b':
-                    if self.validate_possibility(attack_right, board):
-                        self.attack_list += [attack_right]
+            if current_position[1] != 7:
+                if board.board[attack_right[0]][attack_right[1]]:
+                    if board.board[attack_right[0]][attack_right[1]].color == 'b':
+                        if self.validate_possibility(attack_right, board):
+                            self.attack_list += [attack_right]
 
         elif self.color == 'b':
 

@@ -334,7 +334,6 @@ def test_check_checked_checking_true_two():
     expected = 'w'
     assert actual == expected
 
-@pytest.mark.skip('pending')
 def test_checkmate_true():
     board = Board()
     king = King(7,0,'w')
@@ -360,10 +359,10 @@ def test_psuedo_move():
     board.board[7][0] = king
     queen = Queen(6,0,'b')
     board.board[6][0] = queen
-    # rook = Rook(5,0,'b')
-    # board.board[5][0] = rook
+    rook = Rook(5,0,'b')
+    board.board[5][0] = rook
     queen.valid_moves(board)
-    # rook.valid_moves(board)
+    rook.valid_moves(board)
     king.valid_moves(board)
    
     actual = king.psuedo_move([6,0],board)
@@ -383,25 +382,25 @@ def test_checkmate_false():
     expected = False
     assert actual == expected
 
-# def test_scholars_mate():
-#     board = Board()
-#     board.reset_pieces()
-#     board.board[6][4].valid_moves(board)
-#     board.move([6,4],[4,4])
-#     board.board[1][4].valid_moves(board)
-#     board.move([1,4],[3,4])
-#     board.board[7][3].valid_moves(board)
-#     board.move([7,3],[5,5])
-#     board.board[0][1].valid_moves(board)
-#     board.move([0,1],[2,2])
-#     board.board[7][5].valid_moves(board)
-#     board.move([7,5],[4,2])
-#     board.board[0][5].valid_moves(board)
-#     board.move([0,5],[4,1])
-#     board.move([5,5],[1,5])
-#     actual = board.checkmate_status()
-#     expected = True
-#     assert actual == expected
+def test_scholars_mate():
+    board = Board()
+    board.reset_pieces()
+    board.board[6][4].valid_moves(board)
+    board.move([6,4],[4,4])
+    board.board[1][4].valid_moves(board)
+    board.move([1,4],[3,4])
+    board.board[7][3].valid_moves(board)
+    board.move([7,3],[5,5])
+    board.board[0][1].valid_moves(board)
+    board.move([0,1],[2,2])
+    board.board[7][5].valid_moves(board)
+    board.move([7,5],[4,2])
+    board.board[0][5].valid_moves(board)
+    board.move([0,5],[4,1])
+    board.move([5,5],[1,5])
+    actual = board.checkmate_status()
+    expected = True
+    assert actual == expected
 
 def test_pins():
     board = Board()
