@@ -81,7 +81,7 @@ class Board:
         
         for i in range(len(all_moves)):            
             temp_board = Board()
-            print(current_positions[i][0])
+            # print(current_positions[i][0])
             temp_board.move([current_positions[i][0], current_positions[i][1]], [all_moves[i][0], all_moves[i][1]])
             if not temp_board.check_status():
                 return False
@@ -102,9 +102,9 @@ class Board:
             for i in range(0,8):
                 for j in range(0,8):
                     if self.board[i][j]:
-                        if type(self.board[i][j]) == King and self.board[i][j].color == 'w':
+                        if isinstance(self.board[i][j], King) and self.board[i][j].color == 'w':
                             self.white_king_location = [i,j]
-                        elif type(self.board[i][j]) == King and self.board[i][j].color == 'b':
+                        elif isinstance(self.board[i][j], King) and self.board[i][j].color == 'b':
                             self.black_king_location = [i,j]
                         elif self.board[i][j].color == "b":
                             temp_black_attack_list += self.board[i][j].attack_list 
@@ -137,7 +137,7 @@ class Board:
         if not start:
             print('Please choose a piece on the board')
             return   
-                 
+
         if not start.color == self.player_turn:
             print('Other player\'s turn')   
             return

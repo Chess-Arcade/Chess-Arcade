@@ -55,7 +55,7 @@ class Piece:
         if self.not_off_board(move) and not self.same_color_piece(move, board):
             return True
 
-    def test_if_your_king_is_in_check(self):
+    def test_if_your_king_is_in_check(self, board):
         '''
         Go through the whole board and find out if the attempted move results in the same color king being in check
         Returns a truthy if king is under attack
