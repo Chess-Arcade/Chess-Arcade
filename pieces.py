@@ -65,7 +65,7 @@ class Piece:
         def psuedo_move(move):
             temp_board = deepcopy(board)
             temp_board.board[move[0]][move[1]] = temp_board.board[self.row][self.col]
-            temp_board.board[self.row][self.row] = 0
+            temp_board.board[self.row][self.col] = 0
 
             for i in range(8):
                 for j in range(8):
