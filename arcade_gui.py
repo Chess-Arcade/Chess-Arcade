@@ -5,7 +5,7 @@ import ctypes
 ###Constants###
 
 # Screen title and size
-if ctypes.windll:
+if hasattr(ctypes, 'windll'):
 	user32 = ctypes.windll.user32
 	SCREEN_WIDTH = user32.GetSystemMetrics(0)
 	SCREEN_HEIGHT = user32.GetSystemMetrics(1)
