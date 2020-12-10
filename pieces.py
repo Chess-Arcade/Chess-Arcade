@@ -55,6 +55,24 @@ class Piece:
         if self.not_off_board(move) and not self.same_color_piece(move, board):
             return True
 
+    def psuedo_move(self, move, board):
+        temp_board = deepcopy(board)
+        current_piece = temp_board.board[self.row][self.col]
+        temp_board.board[move[0]][move[1]] = current_piece
+        temp_board.board[self.row][self.row] = 0
+
+        for i in range(8):
+            for j in range(8):
+                opponent = temp_board.board[i][j]
+                if opponent:
+                    if opponent.color != self.color:
+                        opponent.valid_moves(temp_board)
+        print('piece color' , self.color)
+        print('check status' , temp_board.check_status())
+        if self.color != temp_board.check_status():
+            return True
+        return False
+
     def test_if_your_king_is_in_check(self, board):
         '''
         Go through the whole board and find out if the attempted move results in the same color king being in check
@@ -62,29 +80,24 @@ class Piece:
         '''
         # take out valid moves that end in king in check
 
-        def psuedo_move(move):
-            temp_board = deepcopy(board)
-            temp_board.board[move[0]][move[1]] = temp_board.board[self.row][self.col]
-            temp_board.board[self.row][self.row] = 0
 
-            for i in range(8):
-                for j in range(8):
-                    if temp_board.board[i][j]:
-                        if temp_board.board[i][j].color != self.color:
-                            temp_board.board[i][j].valid_moves(temp_board)
-
-            if self.color != temp_board.check_status():
-                return True
-            return False
-
-        survivors = []
+        move_survivors = []
 
         for move in self.move_list:
-            if psuedo_move(move):
-                survivors.append(move) 
- 
-        self.move_list = survivors
-        # return self.move_list
+            if self.psuedo_move(move, board):
+                move_survivors.append(move) 
+
+        attack_survivors = []
+
+        for attack in self.attack_list:
+            move_result = self.psuedo_move(attack, board)
+            print('results of testing check on self',move_result)
+            if move_result:
+                attack_survivors.append(attack)
+
+        self.move_list = move_survivors
+        self.attack_list = attack_survivors
+        print('attacks' , attack_survivors)
        
 class King(Piece):
     '''
@@ -140,7 +153,7 @@ class King(Piece):
                         castle_left = [position[0],position[1] - 2]
                         possible_moves.append(castle_left)
        
-        print(possible_moves)
+        # print(possible_moves)
         for move in possible_moves:
             if self.not_off_board(move):
                 if board.board[move[0]][move[1]] and not self.same_color_piece(move, board):
