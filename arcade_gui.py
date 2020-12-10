@@ -329,6 +329,9 @@ class MyGame(arcade.Window):
 		#matrix
 		self.tiles = None
 
+		#move sequence
+		self.move_sequence = None
+
 		self.turn = 'W'
 
 	def end_turn(self):
@@ -340,6 +343,36 @@ class MyGame(arcade.Window):
 			for row in self.tiles:
 				if piece in row:
 					piece.valid_moves(self)
+		self.redraw_tiles()
+
+	def redraw_tiles(self):
+		
+		self.tile_list: arcade.SpriteList = arcade.SpriteList()
+
+		for row in range(8):
+			for column in range(8):
+				if (column+row)%2 == 0:
+					tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (85,85,85))
+				else:
+					tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (245,245,245))
+				tile.position = START_X+(SQUARE_WIDTH*column), START_Y+(SQUARE_HEIGHT*row)
+				self.tile_list.append(tile)
+
+	def undo_move(self):
+
+		if len(self.move_sequence):
+			for i in range(len(self.move_sequence[-1])):
+				if i % 4 == 0:
+					if i == 0:
+						self.move_sequence[-1][i].move_counter -= 1
+					print(self.move_sequence[-1][i].move_counter)
+					self.move_sequence[-1][i].position = self.move_sequence[-1][i+1]
+					self.tiles[self.move_sequence[-1][i+2][0]][self.move_sequence[-1][i+2][1]] = self.move_sequence[-1][i]
+					if self.move_sequence[-1][i+3]:
+						self.tiles[self.move_sequence[-1][i+3][0]][self.move_sequence[-1][i+3][1]] = None
+			self.turn = 'W' if self.turn == 'B' else 'B'
+			self.move_sequence.pop(-1)
+			self.end_turn()
 
 	def setup(self):
 		""" Set up game here, call this to restart """
@@ -350,12 +383,14 @@ class MyGame(arcade.Window):
 		# tiles content list
 		self.tiles = []
 
+		self.move_sequence = []
+
 		# Place tile sprites
 		for row in range(8):
 			self.tiles.append([])
 			for column in range(8):
 				if (column+row)%2==0:
-					tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (55,55,55))
+					tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (85,85,85))
 				else:
 					tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (245,245,245))
 				tile.position = START_X+(SQUARE_WIDTH*column), START_Y+(SQUARE_HEIGHT*row)
@@ -444,17 +479,40 @@ class MyGame(arcade.Window):
 				# save origin for returning piece
 				self.held_piece_origin = piece[0].position
 
+				acceptable_moves = self.held_piece.move_list
+				acceptable_attacks = self.held_piece.attack_list
+
+				#do highlighting
+				for movement in acceptable_moves:
+					sprite_index = (7-movement[0])*8+movement[1]
+					# highlight_tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (200,200,0))
+					# highlight_tile.position = self.tile_list[sprite_index].position
+					# self.tile_list.pop(sprite_index)
+					# self.tile_list.insert(sprite_index, highlight_tile)
+					if (movement[0]+movement[1])%2==0:
+						self.tile_list[sprite_index].color = (0,145,145)
+					else:
+						self.tile_list[sprite_index].color = (0,255,255)
+				for movement in acceptable_attacks:
+					sprite_index = (7-movement[0])*8+movement[1]
+					# highlight_tile = arcade.SpriteSolidColor(SQUARE_HEIGHT, SQUARE_WIDTH, (200,0,0))
+					# highlight_tile.position = self.tile_list[sprite_index].position
+					# self.tile_list.pop(sprite_index)
+					# self.tile_list.insert(sprite_index, highlight_tile)
+					if (movement[0]+movement[1])%2==0:
+						self.tile_list[sprite_index].color = (145,0,0)
+					else:
+						self.tile_list[sprite_index].color = (255,0,0)
+
 	def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
 		""" Called when the user moves mouse """
 
 		# if holding an item move with mouse
 		if self.held_piece:
-			acceptable_moves = self.held_piece.move_list
+
+			#movement tracking
 			self.held_piece.center_x += dx
 			self.held_piece.center_y += dy
-			for movement in acceptable_moves:
-					sprite_index = (7-movement[0])*8+movement[1]
-					self.tile_list[sprite_index].color = (255,255,0)
 
 	def on_mouse_release(self, x:float, y: float, button: int, modifiers: int):
 		""" Called when the user presses a mouse button """
@@ -489,6 +547,7 @@ class MyGame(arcade.Window):
 				pass
 
 			elif new_tile in enemy_pieces:
+				self.move_sequence.append((self.held_piece, self.held_piece_origin, old_tile, (tile_index_y, tile_index_x), new_tile, new_tile.position, (tile_index_y, tile_index_x), None))
 				if enemy_colour == 'W':
 					if self.white_pieces_captured < 8:
 						new_tile.position = START_X+SQUARE_WIDTH*8, \
@@ -505,9 +564,9 @@ class MyGame(arcade.Window):
 						new_tile.position = START_X+SQUARE_WIDTH*11, \
 											START_Y+(SQUARE_HEIGHT*(self.black_pieces_captured-8))
 					self.black_pieces_captured += 1
-				self.tiles[tile_index_y][tile_index_x] = self.held_piece
 				self.held_piece.position = tile.center_x, \
 											tile.center_y
+				self.tiles[tile_index_y][tile_index_x] = self.held_piece
 				self.held_piece.move_counter += 1
 				self.turn = 'W' if self.turn == 'B' else 'B'
 				self.tiles[old_tile[0]][old_tile[1]] = None
@@ -519,14 +578,21 @@ class MyGame(arcade.Window):
 											tile.center_y
 				if tile_index_x > old_tile[1]:
 					castled_rook = self.tiles[tile_index_y][tile_index_x+1]
+					old_pos = castled_rook.position
+					rook_old_shift = 1
+					rook_new_shift = -1
 					self.tiles[tile_index_y][tile_index_x-1] = castled_rook
 					castled_rook.position = tile.center_x-SQUARE_WIDTH, \
 											tile.center_y
 				else:
 					castled_rook = self.tiles[tile_index_y][tile_index_x-2]
+					old_pos = castled_rook.position
+					rook_old_shift = -2
+					rook_new_shift = 1
 					self.tiles[tile_index_y][tile_index_x+1] = castled_rook
 					castled_rook.position = tile.center_x+SQUARE_WIDTH, \
 											tile.center_y
+				self.move_sequence.append((self.held_piece, self.held_piece_origin, old_tile, (tile_index_y, tile_index_x), castled_rook, old_pos, (tile_index_y, tile_index_x+rook_old_shift), (tile_index_y, tile_index_x+rook_new_shift)))
 				self.held_piece.move_counter += 1
 				self.turn = 'W' if self.turn == 'B' else 'B'
 				self.tiles[old_tile[0]][old_tile[1]] = None
@@ -536,6 +602,7 @@ class MyGame(arcade.Window):
 				self.tiles[tile_index_y][tile_index_x] = self.held_piece
 				self.held_piece.position = tile.center_x, \
 											tile.center_y
+				self.move_sequence.append((self.held_piece, self.held_piece_origin, old_tile, (tile_index_y, tile_index_x)))
 				self.turn = 'W' if self.turn == 'B' else 'B'
 				self.tiles[old_tile[0]][old_tile[1]] = None
 				self.held_piece.move_counter += 1
@@ -553,6 +620,10 @@ class MyGame(arcade.Window):
 		if symbol == arcade.key.R:
 			# Restart
 			self.setup()
+
+		if symbol == arcade.key.Z:
+			#undo
+			self.undo_move()
 
 def main():
 	""" Main method """
