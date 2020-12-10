@@ -80,6 +80,10 @@ class Piece:
         '''
         # take out valid moves that end in king in check
 
+        def psuedo_move(move):
+            temp_board = deepcopy(board)
+            temp_board.board[move[0]][move[1]] = temp_board.board[self.row][self.col]
+            temp_board.board[self.row][self.col] = 0
 
         move_survivors = []
 
