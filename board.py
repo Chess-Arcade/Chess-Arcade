@@ -1,4 +1,5 @@
 from pieces import Rook, Knight, Bishop, Queen, King, Pawn
+from copy import deepcopy
 
 class Board:
     '''
@@ -64,28 +65,29 @@ class Board:
         #TODO: call the piece method to update move_list, then check the list and highlight open tiles blue and tiles that can be attacked on red
 
     def checkmate_status(self):
-        all_moves = []
-        current_positions = []
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j]:
-                    if self.player_turn == self.board[i][j].color:
-                        if self.board[i][j].move_list:
-                            for move in self.board[i][j].move_list:
-                                current_positions += [[i,j]]
-                                all_moves += [move]
-                        if self.board[i][j].attack_list:
-                            for move in self.board[i][j].attack_list:
-                                current_positions += [[i,j]]
-                                all_moves += [move]
-        
-        for i in range(len(all_moves)):            
-            temp_board = Board()
-            # print(current_positions[i][0])
-            temp_board.move([current_positions[i][0], current_positions[i][1]], [all_moves[i][0], all_moves[i][1]])
-            if not temp_board.check_status():
-                return False
+
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                current_piece = self.board[i][j]
+
+                if current_piece:
+                    if self.player_turn == current_piece.color:
+                        # if current_piece.move_list:
+                        current_piece.test_if_your_king_is_in_check(self)
+                        if current_piece.move_list:
+                            print('checkmate false due to move list')
+                            return False
+
+                        # if current_piece.attack_list:
+                        current_piece.test_if_your_king_is_in_check(self)
+                        if current_piece.attack_list:
+                            print('checkmate false due to attack list')
+                            return False
+
         return True
+               
+            
+
         # make temp list of all moves
         # run each move through a temporary board
         # check status of that temporary board
@@ -103,6 +105,7 @@ class Board:
                 for j in range(0,8):
                     if self.board[i][j]:
                         if isinstance(self.board[i][j], King) and self.board[i][j].color == 'w':
+                            print('white king location', self.white_king_location)
                             self.white_king_location = [i,j]
                         elif isinstance(self.board[i][j], King) and self.board[i][j].color == 'b':
                             self.black_king_location = [i,j]
@@ -117,9 +120,10 @@ class Board:
             for attacks in temp_white_attack_list:
                 if attacks == self.black_king_location:
                     return 'b'
+            
         except:
             return False
-        
+        return False
 
     def move(self, start_position, end_position):
 
