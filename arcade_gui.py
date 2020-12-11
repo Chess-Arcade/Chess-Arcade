@@ -1,5 +1,6 @@
 import arcade
 import ctypes
+import copy
 # from AppKit import NSScreen
 
 ###Constants###
@@ -48,6 +49,33 @@ class Piece(arcade.Sprite):
 		self.image_file_name = f'assets/images/{self.colour}_{self.piece}.png'
 		super().__init__(self.image_file_name, scale)
 
+	def psuedo_move(self, move, board):
+		original_move_list = copy.deepcopy(self.move_list)
+		original_attack_list = copy.deepcopy(self.attack_list)
+		temp_board = copy.deepcopy(board.tiles)
+		location = board.get_tile_for_piece(self)
+		current_piece = temp_board[location[0]][location[1]]
+		temp_board[move[0]][move[1]] = current_piece
+		temp_board[location[0]][location[1]] = None
+		enemy_piece_list = board.white_piece_list if self.colour == 'Black' else board.black_piece_list
+
+		for piece in enemy_piece_list:
+			for row in board.tiles:
+				if piece in row:
+					piece.valid_moves(board, temp_board)
+
+		if not board.check_status(self.colour, temp_board):
+			self.move_list.clear()
+			self.move_list.extend(original_move_list)
+			self.attack_list.clear()
+			self.attack_list.extend(original_attack_list)
+			return False
+		self.move_list.clear()
+		self.move_list.extend(original_move_list)
+		self.attack_list.clear()
+		self.attack_list.extend(original_attack_list)
+		return True
+
 class King(Piece):
 	'''
 	The king can move one space in any direction as long as there is no piece of the same color on that square, 
@@ -62,7 +90,7 @@ class King(Piece):
 		self.been_checked = False
 		super().__init__(colour, 'King', scale)
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -88,19 +116,19 @@ class King(Piece):
 		move(0,-1)
 
 		if self.move_counter == 0:
-			if board.tiles[king_positon][7]:
-				if board.tiles[king_positon][7].move_counter == 0:
-					if not board.tiles[king_positon][5] and not board.tiles[king_positon][6]:
+			if tile_set[king_positon][7]:
+				if tile_set[king_positon][7].move_counter == 0:
+					if not tile_set[king_positon][5] and not tile_set[king_positon][6]:
 						possible_moves.append((position[0],position[1] + 2))
 
-			if board.tiles[king_positon][0]:
-				if board.tiles[king_positon][0].move_counter == 0:
-					if not board.tiles[king_positon][1] and not board.tiles[king_positon][2] and not board.tiles[king_positon][3]: 
+			if tile_set[king_positon][0]:
+				if tile_set[king_positon][0].move_counter == 0:
+					if not tile_set[king_positon][1] and not tile_set[king_positon][2] and not tile_set[king_positon][3]: 
 						possible_moves.append((position[0],position[1] - 2))
 	   
 		for move in possible_moves:
-			if board.tiles[move[0]][move[1]]:
-				if board.tiles[move[0]][move[1]] in enemy_piece_list:
+			if tile_set[move[0]][move[1]]:
+				if tile_set[move[0]][move[1]] in enemy_piece_list:
 			  		self.attack_list.append((move[0],move[1]))
 			else:
 			  	self.move_list.append((move[0],move[1]))
@@ -113,7 +141,7 @@ class Queen(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Queen', scale)
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -126,8 +154,8 @@ class Queen(Piece):
 			for i in range(7):
 				if 0 > position[1] or position[1] > 7 or 0 > position[0] or position[0] > 7:
 					break
-				if board.tiles[position[0]][position[1]]:
-					if board.tiles[position[0]][position[1]] in enemy_piece_list:
+				if tile_set[position[0]][position[1]]:
+					if tile_set[position[0]][position[1]] in enemy_piece_list:
 						self.attack_list.append((position[0], position[1]))
 					break
 				else:
@@ -149,7 +177,7 @@ class Knight(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Knight', scale)
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -172,8 +200,8 @@ class Knight(Piece):
 		move(-2,-1)
 
 		for move in possible_moves:
-			if board.tiles[move[0]][move[1]]:
-				if board.tiles[move[0]][move[1]] in enemy_piece_list:
+			if tile_set[move[0]][move[1]]:
+				if tile_set[move[0]][move[1]] in enemy_piece_list:
 					self.attack_list.append(move)
 			else:
 				self.move_list.append(move)
@@ -185,7 +213,7 @@ class Bishop(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Bishop', scale)
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -198,8 +226,8 @@ class Bishop(Piece):
 			for i in range(7):
 				if 0 > position[1] or position[1] > 7 or 0 > position[0] or position[0] > 7:
 					break
-				if board.tiles[position[0]][position[1]]:
-					if board.tiles[position[0]][position[1]] in enemy_piece_list:
+				if tile_set[position[0]][position[1]]:
+					if tile_set[position[0]][position[1]] in enemy_piece_list:
 						self.attack_list.append((position[0], position[1]))
 					break
 				else:
@@ -217,7 +245,7 @@ class Rook(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Rook', scale)
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -231,8 +259,8 @@ class Rook(Piece):
 			for i in range (7):
 				if 0 > position[1] or position[1] > 7 or 0 > position[0] or position[0] > 7:
 					break
-				if board.tiles[position[0]][position[1]]:
-					if board.tiles[position[0]][position[1]] in enemy_piece_list:
+				if tile_set[position[0]][position[1]]:
+					if tile_set[position[0]][position[1]] in enemy_piece_list:
 						self.attack_list.append((position[0], position[1]))
 					break
 				else:
@@ -254,12 +282,13 @@ class Pawn(Piece):
 	def promote(self, board):
 		current_position = board.get_tile_for_piece(self)
 		new_queen = Queen(self.colour, .9*(SCREEN_WIDTH/2480))
-		piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		new_queen.position = self.position
+		piece_list = board.white_piece_list if self.colour == 'White' else board.black_piece_list
 		piece_list.remove(self)
 		piece_list.append(new_queen)
-		board.tiles[current_position[0], current_position[1]] = new_queen
+		board.tiles[current_position[0]][current_position[1]] = new_queen
 
-	def valid_moves(self, board):
+	def valid_moves(self, board, tile_set):
 
 		self.move_list.clear()
 		self.attack_list.clear()
@@ -268,38 +297,19 @@ class Pawn(Piece):
 		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
 		direction = -1 if self.colour == 'White' else 1
 
-		if not board.tiles[current_position[0]+direction][current_position[1]]:
+		if not tile_set[current_position[0]+direction][current_position[1]]:
 			self.move_list.append((current_position[0]+direction, current_position[1]))
-			if not self.move_counter and not board.tiles[current_position[0]+2*direction][current_position[1]]:
+			if not self.move_counter and not tile_set[current_position[0]+2*direction][current_position[1]]:
 				self.move_list.append((current_position[0]+2*direction, current_position[1]))
 
 		if current_position[1] != 0:
-			if board.tiles[current_position[0]+direction][current_position[1]-1] in enemy_piece_list:
+			if tile_set[current_position[0]+direction][current_position[1]-1] in enemy_piece_list:
 				self.attack_list.append((current_position[0]+direction, current_position[1]-1))
 
 		if current_position[1] != 7:
-			if board.tiles[current_position[0]+direction][current_position[1]+1] in enemy_piece_list:
+			if tile_set[current_position[0]+direction][current_position[1]+1] in enemy_piece_list:
 				self.attack_list.append((current_position[0]+direction, current_position[1]+1))
-	#TODO: add ability to promote to queen if it reaches end of board
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		#TODO: add ability to promote to queen if it reaches end of board
 
 class MyGame(arcade.Window):
 	"""main application class."""
@@ -334,15 +344,56 @@ class MyGame(arcade.Window):
 
 		self.turn = 'W'
 
+	def check_status(self, team, tile_set):
+
+
+		temp_attack_list = []
+		enemy_piece_list = self.white_piece_list if team == 'Black' else self.black_piece_list
+		ally_piece_list = self.black_piece_list if team == 'Black' else self.white_piece_list
+		king_location = None
+
+		for piece in ally_piece_list:
+			if piece.piece == 'King':
+				king_location = self.get_tile_for_piece(piece)
+		if king_location is None:
+			return True
+		for piece in enemy_piece_list:
+			for row in tile_set:
+				if piece in row:
+					if len(piece.attack_list):
+						temp_attack_list.extend(piece.attack_list)
+			
+		for attack in temp_attack_list:
+			if attack == king_location:
+				return True
+
+		return False
+
 	def end_turn(self):
-		for piece in self.white_piece_list:
+			
+		def calculate_options(piece):
+			move_survivors = []
+			attack_survivors = []
 			for row in self.tiles:
 				if piece in row:
-					piece.valid_moves(self)
-		for piece in self.black_piece_list:
-			for row in self.tiles:
-				if piece in row:
-					piece.valid_moves(self)
+					piece.valid_moves(self, self.tiles)
+					# for move in piece.move_list:
+					# 	if not piece.psuedo_move(move, self):
+					# 		move_survivors.append(move)
+					# piece.move_list.clear()
+					# piece.move_list.extend(move_survivors)
+					# for attack in piece.attack_list:
+					# 	if not piece.psuedo_move(attack, self):
+					# 		attack_survivors.append(attack)
+					# piece.attack_list.clear()
+					# piece.attack_list.extend(attack_survivors)
+		if self.turn == 'W':
+			for piece in self.white_piece_list:
+				calculate_options(piece)
+		else:
+			for piece in self.black_piece_list:
+				calculate_options(piece)
+
 		self.redraw_tiles()
 
 	def redraw_tiles(self):
@@ -365,7 +416,6 @@ class MyGame(arcade.Window):
 				if i % 4 == 0:
 					if i == 0:
 						self.move_sequence[-1][i].move_counter -= 1
-					print(self.move_sequence[-1][i].move_counter)
 					self.move_sequence[-1][i].position = self.move_sequence[-1][i+1]
 					self.tiles[self.move_sequence[-1][i+2][0]][self.move_sequence[-1][i+2][1]] = self.move_sequence[-1][i]
 					if self.move_sequence[-1][i+3]:
@@ -478,9 +528,10 @@ class MyGame(arcade.Window):
 				self.held_piece = piece[0]
 				# save origin for returning piece
 				self.held_piece_origin = piece[0].position
-
+				
 				acceptable_moves = self.held_piece.move_list
 				acceptable_attacks = self.held_piece.attack_list
+
 
 				#do highlighting
 				for movement in acceptable_moves:
@@ -607,6 +658,9 @@ class MyGame(arcade.Window):
 				self.tiles[old_tile[0]][old_tile[1]] = None
 				self.held_piece.move_counter += 1
 				reset_position = False
+
+			if self.held_piece.piece == 'Pawn' and (tile_index_y == 0 or tile_index_y == 7):
+				self.held_piece.promote(self)
 
 		if reset_position:
 			self.held_piece.position = self.held_piece_origin
