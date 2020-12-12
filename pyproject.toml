@@ -2,13 +2,15 @@
 name = "chess-arcade"
 version = "0.1.0"
 description = ""
-authors = ["Yonatan Palagashvili <yonimotek@gmail.com>"]
+authors= ["brendan welzien <brendanwelzien@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pytest = "^6.1.2"
+python = ">=3.8,<3.10"
+arcade = "^2.5"
+pyinstaller = "^4.1"
 
 [tool.poetry.dev-dependencies]
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

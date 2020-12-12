@@ -20,7 +20,7 @@ You should care about our product because it is visual appeling, user friendly a
 
 - The app will be visualy appealing.
 - The app will be playable.
-- The app will have all the chess peices moveable.
+- The app will have all the chess pieces moveable.
 - The chess pieces will be able to move as they are intended to in a regular chess game.
 
 ### Out
