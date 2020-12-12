@@ -1,9 +1,14 @@
 import arcade
 import ctypes
 import copy
+import sys
+import os
 # from AppKit import NSScreen
 
 ###Constants###
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    os.chdir(sys._MEIPASS)
 
 # Screen title and size
 if hasattr(ctypes, 'windll'):
@@ -50,31 +55,36 @@ class Piece(arcade.Sprite):
 		super().__init__(self.image_file_name, scale)
 
 	def psuedo_move(self, move, board):
-		original_move_list = copy.deepcopy(self.move_list)
-		original_attack_list = copy.deepcopy(self.attack_list)
 		temp_board = copy.deepcopy(board.tiles)
-		location = board.get_tile_for_piece(self)
+		location = board.get_tile_for_piece(self, board.tiles)
 		current_piece = temp_board[location[0]][location[1]]
 		temp_board[move[0]][move[1]] = current_piece
 		temp_board[location[0]][location[1]] = None
-		enemy_piece_list = board.white_piece_list if self.colour == 'Black' else board.black_piece_list
+		enemy_piece_list = []
+		ally_piece_list = []
+		if self.colour == 'Black':
+			for row in temp_board:
+				for col in row:
+					if col:
+						if col.colour == 'White':
+							enemy_piece_list.append(col)
+						else:
+							ally_piece_list.append(col)
+		else:
+			for row in temp_board:
+				for col in row:
+					if col:
+						if col.colour == 'Black':
+							enemy_piece_list.append(col)
+						else:
+							ally_piece_list.append(col)
 
 		for piece in enemy_piece_list:
-			for row in board.tiles:
+			for row in temp_board:
 				if piece in row:
-					piece.valid_moves(board, temp_board)
+					piece.valid_moves(board, temp_board, enemy_piece_list)
 
-		if not board.check_status(self.colour, temp_board):
-			self.move_list.clear()
-			self.move_list.extend(original_move_list)
-			self.attack_list.clear()
-			self.attack_list.extend(original_attack_list)
-			return False
-		self.move_list.clear()
-		self.move_list.extend(original_move_list)
-		self.attack_list.clear()
-		self.attack_list.extend(original_attack_list)
-		return True
+		return board.check_status(self.colour, temp_board, enemy_piece_list, ally_piece_list)
 
 class King(Piece):
 	'''
@@ -90,12 +100,11 @@ class King(Piece):
 		self.been_checked = False
 		super().__init__(colour, 'King', scale)
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
-		position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		position = board.get_tile_for_piece(self, tile_set)
 		possible_moves = []
 		king_positon = 7 if self.colour == 'White' else 0
 		# check if the king has not moved, check if the corresponding rook has not moved
@@ -141,13 +150,12 @@ class Queen(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Queen', scale)
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
 
-		current_position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		current_position = board.get_tile_for_piece(self, tile_set)
 
 		def move(y_inc, x_inc):
 			position = [current_position[0] + y_inc, current_position[1] + x_inc]
@@ -177,13 +185,12 @@ class Knight(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Knight', scale)
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
 
-		position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		position = board.get_tile_for_piece(self, tile_set)
 		possible_moves = []
 		
 		def move(y_inc, x_inc):
@@ -213,13 +220,12 @@ class Bishop(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Bishop', scale)
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
 
-		current_position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		current_position = board.get_tile_for_piece(self, tile_set)
 
 		def move(y_inc, x_inc):
 			position = [current_position[0] + y_inc, current_position[1] + x_inc]
@@ -245,13 +251,12 @@ class Rook(Piece):
 	def __init__(self, colour, scale=1):
 		super().__init__(colour, 'Rook', scale)
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
 
-		current_position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		current_position = board.get_tile_for_piece(self, tile_set)
 
 		def move(y_inc, x_inc):
 			position = [current_position[0] + y_inc, current_position[1] + x_inc]
@@ -280,7 +285,7 @@ class Pawn(Piece):
 		super().__init__(colour, 'Pawn', scale)
 
 	def promote(self, board):
-		current_position = board.get_tile_for_piece(self)
+		current_position = board.get_tile_for_piece(self, board.tiles)
 		new_queen = Queen(self.colour, .9*(SCREEN_WIDTH/2480))
 		new_queen.position = self.position
 		piece_list = board.white_piece_list if self.colour == 'White' else board.black_piece_list
@@ -288,13 +293,12 @@ class Pawn(Piece):
 		piece_list.append(new_queen)
 		board.tiles[current_position[0]][current_position[1]] = new_queen
 
-	def valid_moves(self, board, tile_set):
+	def valid_moves(self, board, tile_set, enemy_piece_list):
 
 		self.move_list.clear()
 		self.attack_list.clear()
 
-		current_position = board.get_tile_for_piece(self)
-		enemy_piece_list = board.black_piece_list if self.colour == 'White' else board.white_piece_list
+		current_position = board.get_tile_for_piece(self, tile_set)
 		direction = -1 if self.colour == 'White' else 1
 
 		if not tile_set[current_position[0]+direction][current_position[1]]:
@@ -344,25 +348,22 @@ class MyGame(arcade.Window):
 
 		self.turn = 'W'
 
-	def check_status(self, team, tile_set):
-
+	def check_status(self, team, tile_set, enemy_piece_list, ally_piece_list):
 
 		temp_attack_list = []
-		enemy_piece_list = self.white_piece_list if team == 'Black' else self.black_piece_list
-		ally_piece_list = self.black_piece_list if team == 'Black' else self.white_piece_list
 		king_location = None
 
 		for piece in ally_piece_list:
 			if piece.piece == 'King':
-				king_location = self.get_tile_for_piece(piece)
+				king_location = self.get_tile_for_piece(piece, tile_set)
 		if king_location is None:
 			return True
 		for piece in enemy_piece_list:
 			for row in tile_set:
 				if piece in row:
 					if len(piece.attack_list):
+						print(piece.piece, piece.attack_list)
 						temp_attack_list.extend(piece.attack_list)
-			
 		for attack in temp_attack_list:
 			if attack == king_location:
 				return True
@@ -371,12 +372,12 @@ class MyGame(arcade.Window):
 
 	def end_turn(self):
 			
-		def calculate_options(piece):
+		def calculate_options(piece, enemy_piece_list):
 			move_survivors = []
 			attack_survivors = []
 			for row in self.tiles:
 				if piece in row:
-					piece.valid_moves(self, self.tiles)
+					piece.valid_moves(self, self.tiles, enemy_piece_list)
 					# for move in piece.move_list:
 					# 	if not piece.psuedo_move(move, self):
 					# 		move_survivors.append(move)
@@ -389,10 +390,10 @@ class MyGame(arcade.Window):
 					# piece.attack_list.extend(attack_survivors)
 		if self.turn == 'W':
 			for piece in self.white_piece_list:
-				calculate_options(piece)
+				calculate_options(piece, self.black_piece_list)
 		else:
 			for piece in self.black_piece_list:
-				calculate_options(piece)
+				calculate_options(piece, self.white_piece_list)
 
 		self.redraw_tiles()
 
@@ -487,9 +488,9 @@ class MyGame(arcade.Window):
 					self.white_piece_list.append(piece)
 		self.end_turn()
 
-	def get_tile_for_piece(self, piece):
+	def get_tile_for_piece(self, piece, tile_set):
 		""" what tile is this piece on? """
-		for y_index, row in enumerate(self.tiles):
+		for y_index, row in enumerate(tile_set):
 			for x_index, column in enumerate(row):
 				if piece == column:
 					return (y_index, x_index)
@@ -520,7 +521,7 @@ class MyGame(arcade.Window):
 		if len(piece) > 0:
 
 			# get the tile clicked
-			current_tile_coord = self.get_tile_for_piece(piece[0])
+			current_tile_coord = self.get_tile_for_piece(piece[0], self.tiles)
 
 			# check that the piece existed as tile content
 			if current_tile_coord:
@@ -588,7 +589,7 @@ class MyGame(arcade.Window):
 			tile_index_y = 7-int(tile_index//8)
 			tile_index_x = tile_index%8
 			new_tile = self.tiles[tile_index_y][tile_index_x]
-			old_tile = self.get_tile_for_piece(self.held_piece)
+			old_tile = self.get_tile_for_piece(self.held_piece, self.tiles)
 
 			if old_tile == (tile_index_y, tile_index_x):
 				#TODO: build highlighting
