@@ -51,7 +51,7 @@ class Piece(arcade.Sprite):
 		self.move_counter = 0
 
 		#Image to use for the sprite
-		self.image_file_name = f'assets/images/{self.colour}_{self.piece}.png'
+		self.image_file_name = f'images/{self.colour}_{self.piece}.png'
 		super().__init__(self.image_file_name, scale)
 
 	def psuedo_move(self, move, board):
@@ -658,6 +658,7 @@ class MyGame(arcade.Window):
 					rook_old_shift = 1
 					rook_new_shift = -1
 					self.tiles[tile_index_y][tile_index_x-1] = castled_rook
+					self.tiles[tile_index_y][tile_index_x+1] = None
 					castled_rook.position = tile.center_x-SQUARE_WIDTH, \
 											tile.center_y
 				else:
@@ -666,6 +667,7 @@ class MyGame(arcade.Window):
 					rook_old_shift = -2
 					rook_new_shift = 1
 					self.tiles[tile_index_y][tile_index_x+1] = castled_rook
+					self.tiles[tile_index_y][tile_index_x-2] = None
 					castled_rook.position = tile.center_x+SQUARE_WIDTH, \
 											tile.center_y
 				self.move_sequence.append((self.held_piece, self.held_piece_origin, old_tile, (tile_index_y, tile_index_x), castled_rook, old_pos, (tile_index_y, tile_index_x+rook_old_shift), (tile_index_y, tile_index_x+rook_new_shift)))
