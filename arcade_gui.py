@@ -433,9 +433,8 @@ class MyGame(arcade.Window):
 				piece_list.remove(self.move_sequence[-1][3])
 				piece_list.append(self.move_sequence[-1][1])
 				self.tiles[self.move_sequence[-1][4][0]][self.move_sequence[-1][4][1]] = self.move_sequence[-1][1]
-				self.turn = 'W' if self.turn == 'B' else 'B'
 				self.move_sequence.pop(-1)
-				self.end_turn()
+				self.undo_move()
 				return
 			for i in range(len(self.move_sequence[-1])):
 				if i % 4 == 0:
