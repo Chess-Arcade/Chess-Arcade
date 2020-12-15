@@ -51,15 +51,21 @@ class Piece(arcade.Sprite):
 		self.move_counter = 0
 
 		#Image to use for the sprite
-		self.image_file_name = f'assets/images/{self.colour}_{self.piece}.png'
+		self.image_file_name = f'images/{self.colour}_{self.piece}.png'
 		super().__init__(self.image_file_name, scale)
 
 	def psuedo_move(self, move, board):
-		temp_board = copy.deepcopy(board.tiles)
+		#Identify y,x location for piece before moving
 		location = board.get_tile_for_piece(self, board.tiles)
+		#Create a deep copy of the board matrix with matching albeit different Piece nodes
+		temp_board = copy.deepcopy(board.tiles)
+		#assign the piece on the new board at the desired piece to moves location
 		current_piece = temp_board[location[0]][location[1]]
+		#simulate moving to the option and reassigning the board for the movement
 		temp_board[move[0]][move[1]] = current_piece
 		temp_board[location[0]][location[1]] = None
+
+		#create enemy_piece_list and ally_piece_list
 		enemy_piece_list = []
 		ally_piece_list = []
 		if self.colour == 'Black':
@@ -79,11 +85,14 @@ class Piece(arcade.Sprite):
 						else:
 							ally_piece_list.append(col)
 
+		#Update the valid moves list for the enemy pieces after you move
 		for piece in enemy_piece_list:
 			for row in temp_board:
 				if piece in row:
-					piece.valid_moves(board, temp_board, enemy_piece_list)
-
+					piece.valid_moves(board, temp_board, ally_piece_list)
+					# print(piece.piece,':', piece.attack_list)
+					
+		#return True or False if the ally king is in under attack as a result of the move
 		return board.check_status(self.colour, temp_board, enemy_piece_list, ally_piece_list)
 
 class King(Piece):
@@ -292,6 +301,7 @@ class Pawn(Piece):
 		piece_list.remove(self)
 		piece_list.append(new_queen)
 		board.tiles[current_position[0]][current_position[1]] = new_queen
+		return new_queen
 
 	def valid_moves(self, board, tile_set, enemy_piece_list):
 
@@ -350,24 +360,24 @@ class MyGame(arcade.Window):
 
 	def check_status(self, team, tile_set, enemy_piece_list, ally_piece_list):
 
+		#create a list of attacks to keep track of and assign initial king position value
 		temp_attack_list = []
 		king_location = None
 
+		#find king on board and update the position 
 		for piece in ally_piece_list:
 			if piece.piece == 'King':
 				king_location = self.get_tile_for_piece(piece, tile_set)
-		if king_location is None:
-			return True
+		#add all attack positions to temp_attack_list
 		for piece in enemy_piece_list:
 			for row in tile_set:
 				if piece in row:
-					if len(piece.attack_list):
-						print(piece.piece, piece.attack_list)
-						temp_attack_list.extend(piece.attack_list)
+					temp_attack_list.extend(piece.attack_list)
+		#Check every attack in temp_attack_list to see if there's a match to the kings location and return True if there is
 		for attack in temp_attack_list:
 			if attack == king_location:
 				return True
-
+		#If none of the moves were on the king then return False
 		return False
 
 	def end_turn(self):
@@ -377,17 +387,21 @@ class MyGame(arcade.Window):
 			attack_survivors = []
 			for row in self.tiles:
 				if piece in row:
+					#Generate static move options
 					piece.valid_moves(self, self.tiles, enemy_piece_list)
-					# for move in piece.move_list:
-					# 	if not piece.psuedo_move(move, self):
-					# 		move_survivors.append(move)
-					# piece.move_list.clear()
-					# piece.move_list.extend(move_survivors)
-					# for attack in piece.attack_list:
-					# 	if not piece.psuedo_move(attack, self):
-					# 		attack_survivors.append(attack)
-					# piece.attack_list.clear()
-					# piece.attack_list.extend(attack_survivors)
+					#for each move option do a pseudo move and check for problems caused
+					for move in piece.move_list:
+						if piece.psuedo_move(move, self) == False:
+							move_survivors.append(move)
+					#reset move_list to what made it through the checks only
+					piece.move_list.clear()
+					piece.move_list.extend(move_survivors)
+					#redo the process for attack options
+					for attack in piece.attack_list:
+						if piece.psuedo_move(attack, self) == False:
+							attack_survivors.append(attack)
+					piece.attack_list.clear()
+					piece.attack_list.extend(attack_survivors)
 		if self.turn == 'W':
 			for piece in self.white_piece_list:
 				calculate_options(piece, self.black_piece_list)
@@ -413,6 +427,15 @@ class MyGame(arcade.Window):
 	def undo_move(self):
 
 		if len(self.move_sequence):
+			if self.move_sequence[-1][0] == 'P':
+				self.move_sequence[-1][1].position = self.move_sequence[-1][2]
+				piece_list = self.white_piece_list if self.move_sequence[-1][1].colour == 'White' else self.black_piece_list
+				piece_list.remove(self.move_sequence[-1][3])
+				piece_list.append(self.move_sequence[-1][1])
+				self.tiles[self.move_sequence[-1][4][0]][self.move_sequence[-1][4][1]] = self.move_sequence[-1][1]
+				self.move_sequence.pop(-1)
+				self.undo_move()
+				return
 			for i in range(len(self.move_sequence[-1])):
 				if i % 4 == 0:
 					if i == 0:
@@ -634,6 +657,7 @@ class MyGame(arcade.Window):
 					rook_old_shift = 1
 					rook_new_shift = -1
 					self.tiles[tile_index_y][tile_index_x-1] = castled_rook
+					self.tiles[tile_index_y][tile_index_x+1] = None
 					castled_rook.position = tile.center_x-SQUARE_WIDTH, \
 											tile.center_y
 				else:
@@ -642,6 +666,7 @@ class MyGame(arcade.Window):
 					rook_old_shift = -2
 					rook_new_shift = 1
 					self.tiles[tile_index_y][tile_index_x+1] = castled_rook
+					self.tiles[tile_index_y][tile_index_x-2] = None
 					castled_rook.position = tile.center_x+SQUARE_WIDTH, \
 											tile.center_y
 				self.move_sequence.append((self.held_piece, self.held_piece_origin, old_tile, (tile_index_y, tile_index_x), castled_rook, old_pos, (tile_index_y, tile_index_x+rook_old_shift), (tile_index_y, tile_index_x+rook_new_shift)))
@@ -661,7 +686,8 @@ class MyGame(arcade.Window):
 				reset_position = False
 
 			if self.held_piece.piece == 'Pawn' and (tile_index_y == 0 or tile_index_y == 7):
-				self.held_piece.promote(self)
+				new_queen = self.held_piece.promote(self)
+				self.move_sequence.append(('P', self.held_piece, self.held_piece_origin, new_queen, (tile_index_y, tile_index_x)))
 
 		if reset_position:
 			self.held_piece.position = self.held_piece_origin
