@@ -4,6 +4,12 @@
 
  This project encompasses a reproduction of the game of chess in a virtual format. The chess board contains the pieces and its accompanying abilities as one would see when playing a normal game of chess. The user will have the ability to make moves according to the current placement of the chess pieces.
 
+To play the game download one of the .exe files and run it. You drag pieces whose turn it is and it will highlight tiles it can move to a turqoise color and attack tiles with a red color. Press the 'z' key to undo one move and the 'r' key to reset the whole game.
+
+chess.exe is the original application file produced by the team in 4 days, which will run efficiently but does not compute check logic for limiting move options and has a few bugs primarily having to do with the undo feature, as well as allowing pawns to promote if the drag is released over an end tile whether or not it should be able to move there.
+
+chess_V2.exe has all of these issues resolved but runs a little bit slower and may feel clunky.
+
  ## Wireframing
  ![Chess Board](Assets/wireframe.png)
  ![Domain Model](Assets/domain_model.png)
